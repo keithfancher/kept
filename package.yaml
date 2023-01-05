@@ -24,6 +24,7 @@ dependencies:
 - text
 
 default-extensions:
+- GHC2021
 - OverloadedStrings
 
 ghc-options:
