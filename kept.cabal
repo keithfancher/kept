@@ -35,7 +35,7 @@ library
       base >=4.7 && <5
   default-language: Haskell2010
 
-executable kept-exe
+executable kept
   main-is: Main.hs
   other-modules:
       Paths_kept
