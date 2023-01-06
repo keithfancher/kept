@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Note
+      Parse
   other-modules:
       Paths_kept
   hs-source-dirs:
@@ -37,6 +38,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , bytestring
     , text
   default-language: Haskell2010
 

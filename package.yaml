@@ -42,6 +42,7 @@ library:
   source-dirs: src
   dependencies:
   - aeson
+  - bytestring
 
 executables:
   kept:
