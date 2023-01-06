@@ -66,3 +66,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - kept
+    - hspec
