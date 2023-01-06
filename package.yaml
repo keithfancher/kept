@@ -26,6 +26,7 @@ dependencies:
 default-extensions:
 - GHC2021
 - OverloadedStrings
+- DuplicateRecordFields
 
 ghc-options:
 - -Wall
