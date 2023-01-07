@@ -1,7 +1,7 @@
 module Parse (parseNote) where
 
 import Data.Aeson (FromJSON, decode)
-import Data.ByteString.Lazy as B
+import Data.ByteString.Lazy qualified as B
 import Data.Text qualified as T
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Generics (Generic)
@@ -19,11 +19,11 @@ parseKeepJson :: KeepJSON -> Maybe KeepNote
 parseKeepJson = decode . B.fromStrict . encodeUtf8
 
 mapNote :: KeepNote -> Note
-mapNote note@(KeepNote trash pinned archive noteTitle edited created _ _) =
+mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _) =
   Note
     { metadata =
         Metadata
-          { tags = [], -- TODO
+          { tags = map name labels,
             lastEditedTime = edited,
             createdTime = created,
             isArchived = archive,
@@ -51,9 +51,9 @@ data KeepNote = KeepNote
     title :: T.Text,
     userEditedTimestampUsec :: Int,
     createdTimestampUsec :: Int,
+    labels :: [KeepLabel],
     textContent :: Maybe T.Text,
     listContent :: Maybe [KeepListItem]
-    -- TODO: labels
   }
   deriving (Generic, Show)
 
@@ -66,3 +66,11 @@ data KeepListItem = KeepListItem
   deriving (Generic, Show)
 
 instance FromJSON KeepListItem
+
+-- Labels == tags
+data KeepLabel = KeepLabel
+  { name :: T.Text
+  }
+  deriving (Generic, Show)
+
+instance FromJSON KeepLabel

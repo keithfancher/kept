@@ -23,7 +23,7 @@ basicNoteOutput =
   Note
     { metadata =
         Metadata
-          { tags = [], -- TODO
+          { tags = ["Language"],
             lastEditedTime = 1632886343121000,
             createdTime = 1632886283906000,
             isTrashed = False,
