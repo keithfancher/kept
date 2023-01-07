@@ -19,18 +19,21 @@ parseKeepJson :: KeepJSON -> Maybe KeepNote
 parseKeepJson = decode . B.fromStrict . encodeUtf8
 
 mapNote :: KeepNote -> Note
-mapNote n =
+mapNote note@(KeepNote trash pinned archive noteTitle edited created _ _) =
   Note
     { metadata =
         Metadata
           { tags = [], -- TODO
-            lastEditedTime = 0,
-            createdTime = 0,
-            isArchived = False,
-            isPinned = False,
-            isTrashed = False
+            lastEditedTime = edited,
+            createdTime = created,
+            isArchived = archive,
+            isPinned = pinned,
+            isTrashed = trash
           },
-      content = mapNoteContent n
+      title = case noteTitle of
+        "" -> Nothing
+        nonEmpty -> Just nonEmpty,
+      content = mapNoteContent note
     }
 
 -- Note that note content must be text OR a checklist, but NOT both.

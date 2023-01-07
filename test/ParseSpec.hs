@@ -24,11 +24,12 @@ basicNoteOutput =
     { metadata =
         Metadata
           { tags = [], -- TODO
-            lastEditedTime = 0, -- TODO
-            createdTime = 0, -- TODO
+            lastEditedTime = 1632886343121000,
+            createdTime = 1632886283906000,
             isTrashed = False,
             isPinned = False,
             isArchived = False
           },
+      title = Nothing,
       content = Text "I'm a note! :D"
     }
