@@ -1,5 +1,6 @@
 module ParseSpec (spec) where
 
+import Data.Either (isLeft)
 import Data.Text qualified as T
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 import Parse
@@ -8,14 +9,14 @@ import Test.Hspec
 spec :: Spec
 spec = do
   describe "parseNote" $ do
-    it "returns Nothing if given an empty string input" $ do
-      parseNote "" `shouldBe` Nothing
+    it "fails if given an empty string input" $ do
+      parseNote "" `shouldSatisfy` isLeft
 
     it "parses a basic text note" $ do
-      parseNote basicNoteJson `shouldBe` Just basicNoteOutput
+      parseNote basicNoteJson `shouldBe` Right basicNoteOutput
 
     it "parses a checklist" $ do
-      parseNote checklistJson `shouldBe` Just checklistOutput
+      parseNote checklistJson `shouldBe` Right checklistOutput
 
 basicNoteJson :: T.Text
 basicNoteJson = "{\"color\":\"DEFAULT\",\"isTrashed\":false,\"isPinned\":false,\"isArchived\":false,\"textContent\":\"I'm a note! :D\",\"title\":\"\",\"userEditedTimestampUsec\":1632886343121000,\"createdTimestampUsec\":1632886283906000,\"labels\":[{\"name\":\"Language\"}]}"

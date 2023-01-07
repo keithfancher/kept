@@ -1,23 +1,25 @@
 module Parse (parseNote) where
 
-import Data.Aeson (FromJSON, decode)
+import Data.Aeson (FromJSON, eitherDecode)
 import Data.ByteString.Lazy qualified as B
 import Data.Text qualified as T
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Generics (Generic)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 
+type Error = String -- TODO: real error type
+
 type KeepJSON = T.Text
 
 -- Given the JSON for a single Google Keep note, attempt to parse out our
 -- internal Note type.
-parseNote :: KeepJSON -> Maybe Note
+parseNote :: KeepJSON -> Either Error Note
 parseNote json = mapNote <$> parseKeepJson json
 
 -- First encode (utf8) Text to a ByteString. But Aeson requires a *lazy*
 -- ByteString, so we have to convert one more time.
-parseKeepJson :: KeepJSON -> Maybe KeepNote
-parseKeepJson = decode . B.fromStrict . encodeUtf8
+parseKeepJson :: KeepJSON -> Either Error KeepNote
+parseKeepJson = eitherDecode . B.fromStrict . encodeUtf8
 
 mapNote :: KeepNote -> Note
 mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _) =
