@@ -1,6 +1,5 @@
 module Note
-  ( someFunc,
-    ChecklistItem (..),
+  ( ChecklistItem (..),
     Metadata (..),
     Note (..),
     NoteContent (..),
@@ -9,9 +8,6 @@ module Note
 where
 
 import Data.Text qualified as T
-
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
 
 data Note = Note
   { metadata :: Metadata,
