@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Markdown
       Note
       Parse
   other-modules:
@@ -64,6 +65,7 @@ test-suite kept-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      MarkdownSpec
       ParseSpec
       Paths_kept
   hs-source-dirs:
