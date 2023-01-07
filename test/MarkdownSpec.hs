@@ -8,10 +8,10 @@ spec :: Spec
 spec = do
   describe "noteToMarkdown" $ do
     it "converts a text note" $ do
-      noteToMarkdown basicNote `shouldBe` ""
+      noteToMarkdown basicNote `shouldBe` basicNoteMarkdown
 
     it "converts a checklist" $ do
-      noteToMarkdown checklist `shouldBe` ""
+      noteToMarkdown checklist `shouldBe` checklistMarkdown
 
 basicNote :: Note
 basicNote =
@@ -28,6 +28,9 @@ basicNote =
       title = Nothing,
       content = Text "I'm a note! :D"
     }
+
+basicNoteMarkdown :: Markdown
+basicNoteMarkdown = "---\ntags: []\ncreatedTime: 0\nlastEditedTime: 0\n---\n\nI'm a note! :D"
 
 checklist :: Note
 checklist =
@@ -51,3 +54,6 @@ checklist =
             ChecklistItem "Iceland" False
           ]
     }
+
+checklistMarkdown :: Markdown
+checklistMarkdown = "---\ntags: []\ncreatedTime: 0\nlastEditedTime: 0\n---\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"

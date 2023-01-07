@@ -1,4 +1,8 @@
-module Markdown (noteToMarkdown) where
+module Markdown
+  ( Markdown,
+    noteToMarkdown,
+  )
+where
 
 import Data.Text qualified as T
 import Note (ChecklistItem (..), Metadata, Note (..), NoteContent (..))
