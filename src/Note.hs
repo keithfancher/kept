@@ -15,6 +15,7 @@ someFunc = putStrLn "someFunc"
 
 data Note = Note
   { metadata :: Metadata,
+    title :: Maybe T.Text,
     content :: NoteContent
   }
   deriving (Show, Eq)
