@@ -5,7 +5,7 @@ import Data.ByteString.Lazy qualified as B
 import Data.Text qualified as T
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Generics (Generic)
-import Note (Metadata (..), Note (..), NoteContent (..))
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 
 type KeepJSON = T.Text
 
@@ -14,7 +14,8 @@ type KeepJSON = T.Text
 parseNote :: KeepJSON -> Maybe Note
 parseNote json = mapNote <$> parseKeepJson json
 
--- TODO: docs
+-- First encode (utf8) Text to a ByteString. But Aeson requires a *lazy*
+-- ByteString, so we have to convert one more time.
 parseKeepJson :: KeepJSON -> Maybe KeepNote
 parseKeepJson = decode . B.fromStrict . encodeUtf8
 
@@ -40,8 +41,11 @@ mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _)
 mapNoteContent :: KeepNote -> NoteContent
 mapNoteContent n = case (textContent n, listContent n) of
   (Just textContent, Nothing) -> Text textContent
-  (Nothing, Just listContent) -> Checklist [] -- TODO
-  _ -> error "invalid case" -- TODO: Either
+  (Nothing, Just listContent) -> Checklist $ map mapChecklistItem listContent
+  _ -> error "invalid case" -- TODO: Use eithers, return a left
+
+mapChecklistItem :: KeepListItem -> ChecklistItem
+mapChecklistItem (KeepListItem t c) = ChecklistItem t c
 
 -- An intermediary data type that mirrors the JSON structure for easy parsin'.
 data KeepNote = KeepNote
