@@ -5,7 +5,7 @@ import Data.ByteString.Lazy qualified as B
 import Data.Text qualified as T
 import Data.Text.Encoding (encodeUtf8)
 import GHC.Generics (Generic)
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
 
 type Error = String -- TODO: real error type
 
@@ -26,7 +26,7 @@ mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _)
   Note
     { metadata =
         Metadata
-          { tags = map name labels,
+          { tags = mapLabels labels,
             lastEditedTime = edited,
             createdTime = created,
             isArchived = archive,
@@ -49,6 +49,10 @@ mapNoteContent n = case (textContent n, listContent n) of
 mapChecklistItem :: KeepListItem -> ChecklistItem
 mapChecklistItem (KeepListItem t c) = ChecklistItem t c
 
+mapLabels :: Maybe [KeepLabel] -> [Tag]
+mapLabels Nothing = []
+mapLabels (Just labels) = map name labels
+
 -- An intermediary data type that mirrors the JSON structure for easy parsin'.
 data KeepNote = KeepNote
   { isTrashed :: Bool,
@@ -57,7 +61,7 @@ data KeepNote = KeepNote
     title :: T.Text,
     userEditedTimestampUsec :: Int,
     createdTimestampUsec :: Int,
-    labels :: [KeepLabel],
+    labels :: Maybe [KeepLabel],
     textContent :: Maybe T.Text,
     listContent :: Maybe [KeepListItem]
   }
