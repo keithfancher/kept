@@ -4,6 +4,8 @@ import Data.Aeson (FromJSON, eitherDecode)
 import Data.ByteString.Lazy qualified as B
 import Data.Text qualified as T
 import Data.Text.Encoding (encodeUtf8)
+import Data.Time (UTCTime)
+import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import GHC.Generics (Generic)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
 
@@ -27,8 +29,8 @@ mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _)
     { metadata =
         Metadata
           { tags = mapLabels labels,
-            lastEditedTime = edited,
-            createdTime = created,
+            lastEditedTime = microTimestampToUTC edited,
+            createdTime = microTimestampToUTC created,
             isArchived = archive,
             isPinned = pinned,
             isTrashed = trash
@@ -52,6 +54,12 @@ mapChecklistItem (KeepListItem t c) = ChecklistItem t c
 mapLabels :: Maybe [KeepLabel] -> [Tag]
 mapLabels Nothing = []
 mapLabels (Just labels) = map name labels
+
+-- Input data has a microsecond timestamp, convert to `UTCTime`.
+microTimestampToUTC :: Int -> UTCTime
+microTimestampToUTC microTs = posixSecondsToUTCTime $ fromIntegral tsSeconds
+  where
+    tsSeconds = microTs `div` 1000000
 
 -- An intermediary data type that mirrors the JSON structure for easy parsin'.
 data KeepNote = KeepNote

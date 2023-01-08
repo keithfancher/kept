@@ -8,6 +8,7 @@ module Note
 where
 
 import Data.Text qualified as T
+import Data.Time (UTCTime)
 
 data Note = Note
   { metadata :: Metadata,
@@ -17,8 +18,8 @@ data Note = Note
   deriving (Show, Eq)
 
 data Metadata = Metadata
-  { createdTime :: Int, -- TODO: different type for time
-    lastEditedTime :: Int,
+  { createdTime :: UTCTime,
+    lastEditedTime :: UTCTime,
     tags :: [Tag],
     isTrashed :: Bool,
     isPinned :: Bool,
