@@ -7,7 +7,7 @@ where
 import Data.Text qualified as T
 import Data.Time (UTCTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
 
 type Markdown = T.Text
 
@@ -21,7 +21,9 @@ noteToMarkdown n =
 metadataToMarkdown :: Metadata -> Markdown
 metadataToMarkdown m =
   "---\n"
-    <> "tags: []\n" -- TODO: tags/labels
+    <> "tags: "
+    <> tagsToMarkdown (tags m)
+    <> "\n"
     <> "createdTime: "
     <> timeToMarkdown (createdTime m)
     <> "\n"
@@ -29,6 +31,11 @@ metadataToMarkdown m =
     <> timeToMarkdown (lastEditedTime m)
     <> "\n"
     <> "---"
+
+tagsToMarkdown :: [Tag] -> Markdown
+tagsToMarkdown t = "[" <> commaSeparated <> "]"
+  where
+    commaSeparated = T.intercalate ", " t
 
 titleToMarkdown :: Maybe T.Text -> Markdown
 titleToMarkdown Nothing = ""

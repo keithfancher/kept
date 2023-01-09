@@ -31,7 +31,7 @@ basicNote =
     }
 
 basicNoteMarkdown :: Markdown
-basicNoteMarkdown = "---\ntags: []\ncreatedTime: 2021-09-29T03:31:23Z\nlastEditedTime: 2021-09-29T03:32:23Z\n---\n\nI'm a note! :D"
+basicNoteMarkdown = "---\ntags: [Language]\ncreatedTime: 2021-09-29T03:31:23Z\nlastEditedTime: 2021-09-29T03:32:23Z\n---\n\nI'm a note! :D"
 
 checklist :: Note
 checklist =
@@ -57,4 +57,4 @@ checklist =
     }
 
 checklistMarkdown :: Markdown
-checklistMarkdown = "---\ntags: []\ncreatedTime: 2021-11-29T00:32:09Z\nlastEditedTime: 2021-11-29T00:54:01Z\n---\n\n# Trips\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"
+checklistMarkdown = "---\ntags: [Goals, Travel]\ncreatedTime: 2021-11-29T00:32:09Z\nlastEditedTime: 2021-11-29T00:54:01Z\n---\n\n# Trips\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"
