@@ -60,6 +60,7 @@ executable kept
       base >=4.7 && <5
     , kept
     , text
+    , time
   default-language: Haskell2010
 
 test-suite kept-test
@@ -81,4 +82,5 @@ test-suite kept-test
     , hspec
     , kept
     , text
+    , time
   default-language: Haskell2010

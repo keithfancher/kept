@@ -2,6 +2,7 @@ module MarkdownSpec (spec) where
 
 import Markdown
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
+import Parse (microTimestampToUTC)
 import Test.Hspec
 
 spec :: Spec
@@ -19,8 +20,8 @@ basicNote =
     { metadata =
         Metadata
           { tags = ["Language"],
-            lastEditedTime = 1632886343121000,
-            createdTime = 1632886283906000,
+            lastEditedTime = microTimestampToUTC 1632886343121000,
+            createdTime = microTimestampToUTC 1632886283906000,
             isTrashed = False,
             isPinned = False,
             isArchived = False
@@ -30,7 +31,7 @@ basicNote =
     }
 
 basicNoteMarkdown :: Markdown
-basicNoteMarkdown = "---\ntags: []\ncreatedTime: 0\nlastEditedTime: 0\n---\n\nI'm a note! :D"
+basicNoteMarkdown = "---\ntags: []\ncreatedTime: 2021-09-29T03:31:23Z\nlastEditedTime: 2021-09-29T03:32:23Z\n---\n\nI'm a note! :D"
 
 checklist :: Note
 checklist =
@@ -38,8 +39,8 @@ checklist =
     { metadata =
         Metadata
           { tags = ["Goals", "Travel"],
-            lastEditedTime = 1638147241847000,
-            createdTime = 1638145929577000,
+            lastEditedTime = microTimestampToUTC 1638147241847000,
+            createdTime = microTimestampToUTC 1638145929577000,
             isTrashed = False,
             isPinned = True,
             isArchived = False
@@ -56,4 +57,4 @@ checklist =
     }
 
 checklistMarkdown :: Markdown
-checklistMarkdown = "---\ntags: []\ncreatedTime: 0\nlastEditedTime: 0\n---\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"
+checklistMarkdown = "---\ntags: []\ncreatedTime: 2021-11-29T00:32:09Z\nlastEditedTime: 2021-11-29T00:54:01Z\n---\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"

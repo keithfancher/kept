@@ -27,8 +27,8 @@ basicNoteOutput =
     { metadata =
         Metadata
           { tags = ["Language"],
-            lastEditedTime = 1632886343121000,
-            createdTime = 1632886283906000,
+            lastEditedTime = microTimestampToUTC 1632886343121000,
+            createdTime = microTimestampToUTC 1632886283906000,
             isTrashed = False,
             isPinned = False,
             isArchived = False
@@ -46,8 +46,8 @@ checklistOutput =
     { metadata =
         Metadata
           { tags = ["Goals", "Travel"],
-            lastEditedTime = 1638147241847000,
-            createdTime = 1638145929577000,
+            lastEditedTime = microTimestampToUTC 1638147241847000,
+            createdTime = microTimestampToUTC 1638145929577000,
             isTrashed = False,
             isPinned = True,
             isArchived = False

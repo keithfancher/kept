@@ -1,4 +1,8 @@
-module Parse (parseNote) where
+module Parse
+  ( parseNote,
+    microTimestampToUTC,
+  )
+where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import Data.ByteString.Lazy qualified as B
