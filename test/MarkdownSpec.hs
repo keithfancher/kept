@@ -57,4 +57,4 @@ checklist =
     }
 
 checklistMarkdown :: Markdown
-checklistMarkdown = "---\ntags: []\ncreatedTime: 2021-11-29T00:32:09Z\nlastEditedTime: 2021-11-29T00:54:01Z\n---\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"
+checklistMarkdown = "---\ntags: []\ncreatedTime: 2021-11-29T00:32:09Z\nlastEditedTime: 2021-11-29T00:54:01Z\n---\n\n# Trips\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"

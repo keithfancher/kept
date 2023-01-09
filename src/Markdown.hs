@@ -15,13 +15,13 @@ noteToMarkdown :: Note -> Markdown
 noteToMarkdown n =
   metadataToMarkdown (metadata n)
     <> "\n\n"
-    <> contentToMarkdown (content n) -- TODO: title
+    <> titleToMarkdown (title n)
+    <> contentToMarkdown (content n)
 
--- TODO
 metadataToMarkdown :: Metadata -> Markdown
 metadataToMarkdown m =
   "---\n"
-    <> "tags: []\n"
+    <> "tags: []\n" -- TODO: tags/labels
     <> "createdTime: "
     <> timeToMarkdown (createdTime m)
     <> "\n"
@@ -29,6 +29,10 @@ metadataToMarkdown m =
     <> timeToMarkdown (lastEditedTime m)
     <> "\n"
     <> "---"
+
+titleToMarkdown :: Maybe T.Text -> Markdown
+titleToMarkdown Nothing = ""
+titleToMarkdown (Just t) = "# " <> t <> "\n\n"
 
 contentToMarkdown :: NoteContent -> Markdown
 contentToMarkdown (Text t) = t
