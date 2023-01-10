@@ -69,6 +69,7 @@ test-suite kept-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      FileSpec
       MarkdownSpec
       ParseSpec
       Paths_kept
