@@ -42,6 +42,13 @@ packages:
 #
 # extra-deps: []
 
+extra-deps:
+# Latest version of hspec, newer than what's in Stackage. Specifically to fix
+# the annoying warning about missing export lists when using hspec-discover.
+- hspec-2.10.8
+- hspec-core-2.10.8
+- hspec-discover-2.10.8
+
 # Override default flag values for local packages and extra-deps
 # flags: {}
 
