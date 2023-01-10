@@ -24,8 +24,9 @@ dependencies:
 - text
 - time
 
+language: GHC2021 # the future!
+
 default-extensions:
-- GHC2021
 - OverloadedStrings
 - DuplicateRecordFields
 

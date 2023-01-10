@@ -34,7 +34,6 @@ library
   hs-source-dirs:
       src
   default-extensions:
-      GHC2021
       OverloadedStrings
       DuplicateRecordFields
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
@@ -45,7 +44,7 @@ library
     , filepath
     , text
     , time
-  default-language: Haskell2010
+  default-language: GHC2021
 
 executable kept
   main-is: Main.hs
@@ -54,7 +53,6 @@ executable kept
   hs-source-dirs:
       app
   default-extensions:
-      GHC2021
       OverloadedStrings
       DuplicateRecordFields
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
@@ -63,7 +61,7 @@ executable kept
     , kept
     , text
     , time
-  default-language: Haskell2010
+  default-language: GHC2021
 
 test-suite kept-test
   type: exitcode-stdio-1.0
@@ -76,7 +74,6 @@ test-suite kept-test
   hs-source-dirs:
       test
   default-extensions:
-      GHC2021
       OverloadedStrings
       DuplicateRecordFields
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
@@ -86,4 +83,4 @@ test-suite kept-test
     , kept
     , text
     , time
-  default-language: Haskell2010
+  default-language: GHC2021
