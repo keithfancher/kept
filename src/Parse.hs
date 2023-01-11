@@ -1,5 +1,6 @@
 module Parse
-  ( parseNote,
+  ( KeepJSON,
+    parseNote,
     microTimestampToUTC,
   )
 where
