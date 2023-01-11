@@ -24,9 +24,9 @@ noteToFile n =
     }
   where
     filenameWithPath = subdir </> noteFilename n
-    subdir = notePath (metadata n)
+    subdir = noteSubDir (metadata n)
 
--- Get the filename for a note. NOT the full path. See also: `notePath`, below.
+-- Get the filename for a note. NOT the full path. See also `noteSubDir`, below.
 --
 -- TODO: will makeValid remove `/`? Or just think it's part of the path?
 -- Probably the latter, might need a bit of my own filtering too.
@@ -58,9 +58,9 @@ titleFromContent (Checklist c) = T.take 35 $ listAsText c
 -- TODO: could split by year? add option for NO subdirs, depending on your
 -- software that might be easiest. (Just use the tag metadata to sort through
 -- your notes.)
-notePath :: Metadata -> FilePath
-notePath (Metadata _ _ _ True _ _) = "trash"
-notePath (Metadata _ _ _ _ _ True) = "archive"
-notePath (Metadata _ _ _ _ True _) = "pinned"
-notePath (Metadata _ _ [] _ _ _) = "untagged"
-notePath (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" tags -- TODO: sort tags (case sens?)
+noteSubDir :: Metadata -> FilePath
+noteSubDir (Metadata _ _ _ True _ _) = "trash"
+noteSubDir (Metadata _ _ _ _ _ True) = "archive"
+noteSubDir (Metadata _ _ _ _ True _) = "pinned"
+noteSubDir (Metadata _ _ [] _ _ _) = "untagged"
+noteSubDir (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" tags -- TODO: sort tags (case sens?)
