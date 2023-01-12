@@ -28,7 +28,7 @@ noteToFile n =
 
 -- Get the filename for a note. NOT the full path. See also `noteSubDir`, below.
 noteFilename :: Note -> FilePath
-noteFilename (Note _ title cont) = makeValidT $ removePathDelimiters $ base <> ext
+noteFilename (Note _ title cont) = makeValidT $ removeDelimiters $ base <> ext
   where
     base = case title of
       Nothing -> titleFromContent cont
@@ -39,12 +39,15 @@ noteFilename (Note _ title cont) = makeValidT $ removePathDelimiters $ base <> e
 -- Technically a filename is "valid" even if it contains path delimiters (at
 -- least according to `System.FilePath`). That doesn't work for our case
 -- though, e.g. if the title of a note is `Stuff/Things`, we don't want it to
--- create a `Stuff` directory.
-removePathDelimiters :: T.Text -> T.Text
-removePathDelimiters = T.map replaceSlashes
+-- create a `Stuff` directory. Also apparently newlines can exist in a
+-- filename?!
+removeDelimiters :: T.Text -> T.Text
+removeDelimiters = T.map replaceSlashes
   where
     replaceSlashes '/' = '-'
     replaceSlashes '\\' = '-'
+    replaceSlashes '\n' = ' '
+    replaceSlashes '\r' = ' '
     replaceSlashes nonSlash = nonSlash
 
 -- If a note doesn't have a title, generate one by grabbing the first 35

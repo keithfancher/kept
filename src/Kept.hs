@@ -25,6 +25,7 @@ exportNoteToFile jsonPath = exportNote jsonPath writeNoteFile
 exportNoteToStdOut :: FilePath -> IO ()
 exportNoteToStdOut jsonPath = exportNote jsonPath printNoteFile
 
+-- TODO: handle duplicate file names!
 writeNoteFile :: File -> IO ()
 writeNoteFile (File fullNotePath content) = do
   let noteDirectory = keptOutputDir </> takeDirectory fullNotePath
