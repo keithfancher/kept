@@ -7,8 +7,14 @@ where
 import Data.Text.IO qualified as TIO
 import File (File (..), noteToFile)
 import Parse (KeepJSON, parseNote)
+import System.Directory (createDirectoryIfMissing)
+import System.FilePath (takeDirectory, (</>))
 
 type Error = String -- TODO: real error type
+
+-- Prepended to all output file paths, keep everything together.
+keptOutputDir :: FilePath
+keptOutputDir = "kept-output"
 
 -- Reads the exported Google Keep json from the given file path, converts it to
 -- markdown, and writes a new file.
@@ -20,7 +26,11 @@ exportNoteToStdOut :: FilePath -> IO ()
 exportNoteToStdOut jsonPath = exportNote jsonPath printNoteFile
 
 writeNoteFile :: File -> IO ()
-writeNoteFile (File path content) = TIO.writeFile path content
+writeNoteFile (File fullNotePath content) = do
+  let noteDirectory = keptOutputDir </> takeDirectory fullNotePath
+  let createParentDirs = True
+  _ <- createDirectoryIfMissing createParentDirs noteDirectory
+  TIO.writeFile (keptOutputDir </> fullNotePath) content
 
 printNoteFile :: File -> IO ()
 printNoteFile (File path content) = do

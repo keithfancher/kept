@@ -42,6 +42,7 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , filepath
     , text
     , time

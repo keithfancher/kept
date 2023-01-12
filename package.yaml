@@ -46,6 +46,7 @@ library:
   dependencies:
   - aeson
   - bytestring
+  - directory
   - filepath
 
 executables:
