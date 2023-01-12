@@ -27,17 +27,25 @@ noteToFile n =
     subdir = noteSubDir (metadata n)
 
 -- Get the filename for a note. NOT the full path. See also `noteSubDir`, below.
---
--- TODO: will makeValid remove `/`? Or just think it's part of the path?
--- Probably the latter, might need a bit of my own filtering too.
 noteFilename :: Note -> FilePath
-noteFilename (Note _ title cont) = makeValidT $ base <> ext
+noteFilename (Note _ title cont) = makeValidT $ removePathDelimiters $ base <> ext
   where
     base = case title of
       Nothing -> titleFromContent cont
       Just t -> t
     makeValidT = makeValid . T.unpack -- valid FilePath from Text
     ext = ".md"
+
+-- Technically a filename is "valid" even if it contains path delimiters (at
+-- least according to `System.FilePath`). That doesn't work for our case
+-- though, e.g. if the title of a note is `Stuff/Things`, we don't want it to
+-- create a `Stuff` directory.
+removePathDelimiters :: T.Text -> T.Text
+removePathDelimiters = T.map replaceSlashes
+  where
+    replaceSlashes '/' = '-'
+    replaceSlashes '\\' = '-'
+    replaceSlashes nonSlash = nonSlash
 
 -- If a note doesn't have a title, generate one by grabbing the first 35
 -- characters from the content. (35 is arbitrary -- long enough, not too long.

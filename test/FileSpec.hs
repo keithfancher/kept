@@ -11,8 +11,8 @@ spec = do
     it "generates the correct path for an untitled text note" $ do
       path (noteToFile basicNote) `shouldBe` "Language/I'm a note! :D.md"
 
-    it "generates the correct path for a checklist" $ do
-      path (noteToFile checklist) `shouldBe` "pinned/Trips.md"
+    it "generates the correct path when note has a path delimiter in the title" $ do
+      path (noteToFile checklist) `shouldBe` "pinned/Trips-To Live.md"
 
     it "generates the correct path for an untitled checklist" $ do
       path (noteToFile untitledChecklist) `shouldBe` "Lists/vim, neovim, vs code, sublime, ed.md"
@@ -45,7 +45,7 @@ checklist =
             isPinned = True,
             isArchived = False
           },
-      title = Just "Trips",
+      title = Just "Trips/To Live", -- Note: This won't work as-is as a filename D:
       content =
         Checklist
           [ ChecklistItem "France" True,
