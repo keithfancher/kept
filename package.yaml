@@ -58,6 +58,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - kept
+    - optparse-applicative
 
 tests:
   kept-test:

@@ -50,6 +50,7 @@ library
 executable kept
   main-is: Main.hs
   other-modules:
+      Args
       Paths_kept
   hs-source-dirs:
       app
@@ -60,6 +61,7 @@ executable kept
   build-depends:
       base >=4.7 && <5
     , kept
+    , optparse-applicative
     , text
     , time
   default-language: GHC2021
