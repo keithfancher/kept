@@ -7,7 +7,6 @@ import Options.Applicative (execParser)
 main :: IO ()
 main = do
   (KeptOptions stdIO inFiles) <- execParser cliOptParser
-  let filePath = head inFiles -- TODO: temporary, of course, for some quick testing
   if stdIO
-    then exportNoteToStdOut filePath
+    then mapM_ exportNoteToStdOut inFiles
     else error "implement me! ;)"
