@@ -30,7 +30,7 @@ noteToFile n =
 noteFilename :: Note -> FilePath
 noteFilename (Note _ title cont) = makeValidT $ removeDelimiters $ base <> ext
   where
-    base = case title of
+    base = T.strip $ case title of -- Note `strip`: prevents awkward whitespace b/w base and extension
       Nothing -> titleFromContent cont
       Just t -> t
     makeValidT = makeValid . T.unpack -- valid FilePath from Text
