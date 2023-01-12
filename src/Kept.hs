@@ -30,6 +30,8 @@ writeNoteFile (File fullNotePath content) = do
   let noteDirectory = keptOutputDir </> takeDirectory fullNotePath
   let createParentDirs = True
   _ <- createDirectoryIfMissing createParentDirs noteDirectory
+  let evenFullerNotePath = keptOutputDir </> fullNotePath
+  putStrLn $ "Writing file to " <> evenFullerNotePath
   TIO.writeFile (keptOutputDir </> fullNotePath) content
 
 printNoteFile :: File -> IO ()
