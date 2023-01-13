@@ -1,5 +1,6 @@
 module Parse
   ( KeepJSON,
+    ParseError,
     parseNote,
     microTimestampToUTC,
   )
@@ -14,18 +15,18 @@ import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import GHC.Generics (Generic)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
 
-type Error = String -- TODO: real error type
+type ParseError = String
 
 type KeepJSON = T.Text
 
 -- Given the JSON for a single Google Keep note, attempt to parse out our
 -- internal Note type.
-parseNote :: KeepJSON -> Either Error Note
+parseNote :: KeepJSON -> Either ParseError Note
 parseNote json = mapNote <$> parseKeepJson json
 
 -- First encode (utf8) Text to a ByteString. But Aeson requires a *lazy*
 -- ByteString, so we have to convert one more time.
-parseKeepJson :: KeepJSON -> Either Error KeepNote
+parseKeepJson :: KeepJSON -> Either ParseError KeepNote
 parseKeepJson = eitherDecode . B.fromStrict . encodeUtf8
 
 mapNote :: KeepNote -> Note

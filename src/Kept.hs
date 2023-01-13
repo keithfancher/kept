@@ -6,11 +6,9 @@ where
 
 import Data.Text.IO qualified as TIO
 import File (File (..), noteToFile)
-import Parse (KeepJSON, parseNote)
+import Parse (KeepJSON, ParseError, parseNote)
 import System.Directory (createDirectoryIfMissing, doesFileExist, setModificationTime)
 import System.FilePath (dropExtension, takeDirectory, takeExtension, (</>))
-
-type Error = String -- TODO: real error type
 
 -- Prepended to all output file paths, keep everything together.
 keptOutputDir :: FilePath
@@ -69,5 +67,5 @@ exportNote jsonPath export = do
     Left e -> putStrLn $ "Error: " <> e
     Right f -> export f
 
-convertKeepNote :: KeepJSON -> Either Error File
+convertKeepNote :: KeepJSON -> Either ParseError File
 convertKeepNote json = noteToFile <$> parseNote json
