@@ -5,6 +5,7 @@ module File
 where
 
 import Data.Text qualified as T
+import Data.Time (UTCTime)
 import Markdown (noteToMarkdown)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 import System.FilePath (makeValid, (</>))
@@ -12,7 +13,8 @@ import System.FilePath (makeValid, (</>))
 -- Simple container for text that lives at some filepath.
 data File = File
   { path :: FilePath,
-    content :: T.Text
+    content :: T.Text,
+    lastModified :: UTCTime
   }
   deriving (Show, Eq)
 
@@ -20,9 +22,11 @@ noteToFile :: Note -> File
 noteToFile n =
   File
     { path = makeValid filenameWithPath,
-      content = noteToMarkdown n
+      content = noteToMarkdown n,
+      lastModified = modified
     }
   where
+    modified = lastEditedTime (metadata n)
     filenameWithPath = subdir </> noteFilename n
     subdir = noteSubDir (metadata n)
 

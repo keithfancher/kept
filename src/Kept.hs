@@ -7,7 +7,7 @@ where
 import Data.Text.IO qualified as TIO
 import File (File (..), noteToFile)
 import Parse (KeepJSON, parseNote)
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, setModificationTime)
 import System.FilePath (takeDirectory, (</>))
 
 type Error = String -- TODO: real error type
@@ -27,16 +27,17 @@ exportNoteToStdOut jsonPath = exportNote jsonPath printNoteFile
 
 -- TODO: handle duplicate file names!
 writeNoteFile :: File -> IO ()
-writeNoteFile (File fullNotePath content) = do
+writeNoteFile (File fullNotePath content modified) = do
   let noteDirectory = keptOutputDir </> takeDirectory fullNotePath
   let createParentDirs = True
   _ <- createDirectoryIfMissing createParentDirs noteDirectory
   let evenFullerNotePath = keptOutputDir </> fullNotePath
   putStrLn $ "Writing file to " <> evenFullerNotePath
-  TIO.writeFile (keptOutputDir </> fullNotePath) content
+  TIO.writeFile evenFullerNotePath content
+  setModificationTime evenFullerNotePath modified
 
 printNoteFile :: File -> IO ()
-printNoteFile (File path content) = do
+printNoteFile (File path content _) = do
   putStrLn $ "NOTE PATH:\n" <> path <> "\n\n" <> "NOTE CONTENT:"
   TIO.putStrLn content
 
