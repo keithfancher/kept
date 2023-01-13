@@ -7,8 +7,8 @@ where
 import Data.Text.IO qualified as TIO
 import File (File (..), noteToFile)
 import Parse (KeepJSON, parseNote)
-import System.Directory (createDirectoryIfMissing, setModificationTime)
-import System.FilePath (takeDirectory, (</>))
+import System.Directory (createDirectoryIfMissing, doesFileExist, setModificationTime)
+import System.FilePath (dropExtension, takeDirectory, takeExtension, (</>))
 
 type Error = String -- TODO: real error type
 
@@ -25,16 +25,37 @@ exportNoteToFile jsonPath = exportNote jsonPath writeNoteFile
 exportNoteToStdOut :: FilePath -> IO ()
 exportNoteToStdOut jsonPath = exportNote jsonPath printNoteFile
 
--- TODO: handle duplicate file names!
 writeNoteFile :: File -> IO ()
 writeNoteFile (File fullNotePath content modified) = do
+  -- First create the directory for our note:
   let noteDirectory = keptOutputDir </> takeDirectory fullNotePath
   let createParentDirs = True
   _ <- createDirectoryIfMissing createParentDirs noteDirectory
-  let evenFullerNotePath = keptOutputDir </> fullNotePath
-  putStrLn $ "Writing file to " <> evenFullerNotePath
-  TIO.writeFile evenFullerNotePath content
-  setModificationTime evenFullerNotePath modified
+  -- Make sure we have a unique file name and write the file:
+  uniqueNotePath <- getUniqueFileName (keptOutputDir </> fullNotePath) 0
+  putStrLn $ "Writing file to " <> uniqueNotePath
+  TIO.writeFile uniqueNotePath content
+  -- And finally, set the modification timestamp to match the note metadata:
+  setModificationTime uniqueNotePath modified
+
+-- Checks if the given file name already exists. If it does, add a
+-- parenthetical number. Keep incrementing that number until the file doesn't
+-- exist. (Could also use metadata timestamp? But even that's not guaranteed to
+-- be unique.)
+getUniqueFileName :: FilePath -> Int -> IO FilePath
+getUniqueFileName file attemptNum = do
+  let fn = addNumberToFileName file attemptNum
+  fileAlreadyExists <- doesFileExist fn
+  if fileAlreadyExists
+    then getUniqueFileName file (attemptNum + 1)
+    else return fn
+
+addNumberToFileName :: FilePath -> Int -> FilePath
+addNumberToFileName f 0 = f
+addNumberToFileName f n = sansExtension <> " (" <> show n <> ")" <> extension
+  where
+    sansExtension = dropExtension f
+    extension = takeExtension f
 
 printNoteFile :: File -> IO ()
 printNoteFile (File path content _) = do

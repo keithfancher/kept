@@ -57,8 +57,6 @@ removeDelimiters = T.map replaceSlashes
 -- If a note doesn't have a title, generate one by grabbing the first
 -- `titleLength` characters from the content. If it's a checklist, first
 -- combine the list items.
---
--- TODO: Include (last edited) date in this? Need a decent chance of uniqueness...
 titleFromContent :: NoteContent -> T.Text
 titleFromContent (Text t) = T.take titleLength t
 titleFromContent (Checklist c) = T.take titleLength $ listAsText c
