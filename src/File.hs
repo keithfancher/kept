@@ -54,16 +54,22 @@ removeDelimiters = T.map replaceSlashes
     replaceSlashes '\r' = ' '
     replaceSlashes nonSlash = nonSlash
 
--- If a note doesn't have a title, generate one by grabbing the first 35
--- characters from the content. (35 is arbitrary -- long enough, not too long.
--- Whatever that means.) If it's a checklist, first combine the list items.
+-- If a note doesn't have a title, generate one by grabbing the first
+-- `titleLength` characters from the content. If it's a checklist, first
+-- combine the list items.
 --
 -- TODO: Include (last edited) date in this? Need a decent chance of uniqueness...
 titleFromContent :: NoteContent -> T.Text
-titleFromContent (Text t) = T.take 35 t
-titleFromContent (Checklist c) = T.take 35 $ listAsText c
+titleFromContent (Text t) = T.take titleLength t
+titleFromContent (Checklist c) = T.take titleLength $ listAsText c
   where
     listAsText l = T.intercalate ", " (map text l)
+
+-- How many characters of content we'll grab to generate a title. Somewhat
+-- arbitrarily chose to be "long enough". But not "too long". Whatever that
+-- means!
+titleLength :: Int
+titleLength = 45
 
 -- Sort the notes into subdirectories. Prioritize trash, archive, and pinned.
 -- (In that order. For example, if a note is trashed, we don't care about its
