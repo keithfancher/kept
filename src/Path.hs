@@ -1,32 +1,16 @@
-module File
-  ( File (..),
-    noteToFile,
+module Path
+  ( getNotePath,
   )
 where
 
 import Data.Text qualified as T
-import Data.Time (UTCTime)
-import Markdown (noteToMarkdown)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 import System.FilePath (makeValid, (</>))
 
--- Simple container for text that lives at some filepath.
-data File = File
-  { path :: FilePath,
-    content :: T.Text,
-    lastModified :: UTCTime
-  }
-  deriving (Show, Eq)
-
-noteToFile :: Note -> File
-noteToFile n =
-  File
-    { path = makeValid filenameWithPath,
-      content = noteToMarkdown n,
-      lastModified = modified
-    }
+-- The logic to determine the file path for a given note.
+getNotePath :: Note -> FilePath
+getNotePath n = makeValid filenameWithPath
   where
-    modified = lastEditedTime (metadata n)
     filenameWithPath = subdir </> noteFilename n
     subdir = noteSubDir (metadata n)
 

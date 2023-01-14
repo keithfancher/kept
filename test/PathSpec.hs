@@ -1,21 +1,21 @@
-module FileSpec (spec) where
+module PathSpec (spec) where
 
-import File
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 import Parse (microTimestampToUTC)
+import Path
 import Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "noteToFile" $ do
+  describe "getNotePath" $ do
     it "generates the correct path for an untitled text note" $ do
-      path (noteToFile basicNote) `shouldBe` "Language/I'm a note! :D.md"
+      getNotePath basicNote `shouldBe` "Language/I'm a note! :D.md"
 
     it "generates the correct path when note has a path delimiter in the title" $ do
-      path (noteToFile checklist) `shouldBe` "pinned/Trips-To Live.md"
+      getNotePath checklist `shouldBe` "pinned/Trips-To Live.md"
 
     it "generates the correct path for an untitled checklist" $ do
-      path (noteToFile untitledChecklist) `shouldBe` "Lists/vim, neovim, vs code, sublime, ed.md"
+      getNotePath untitledChecklist `shouldBe` "Lists/vim, neovim, vs code, sublime, ed.md"
 
 basicNote :: Note
 basicNote =

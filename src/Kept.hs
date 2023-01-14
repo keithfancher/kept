@@ -4,11 +4,23 @@ module Kept
   )
 where
 
+import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
-import File (File (..), noteToFile)
+import Data.Time (TimeZone, UTCTime, getCurrentTimeZone)
+import Markdown (noteToMarkdown)
+import Note (Metadata (..), Note (..))
 import Parse (KeepJSON, ParseError, parseNote)
+import Path (getNotePath)
 import System.Directory (createDirectoryIfMissing, doesFileExist, setModificationTime)
 import System.FilePath (dropExtension, takeDirectory, takeExtension, (</>))
+
+-- Simple container for text that lives at some filepath.
+data File = File
+  { path :: FilePath,
+    content :: T.Text,
+    lastModified :: UTCTime
+  }
+  deriving (Show, Eq)
 
 -- Prepended to all output file paths, keep everything together.
 keptOutputDir :: FilePath
@@ -65,9 +77,20 @@ printNoteFile (File path content _) = do
 exportNote :: FilePath -> (File -> IO ()) -> IO ()
 exportNote jsonPath export = do
   json <- TIO.readFile jsonPath
-  case convertKeepNote json of
+  -- TODO: subtle bug here -- will apply the CURRENT daylight savings state to
+  -- the timestamp, rather than what it would have been at that time. Maybe do
+  -- something with `utcToLocalZonedTime`?
+  tz <- getCurrentTimeZone
+  case convertKeepNote json tz of
     Left e -> putStrLn $ "Error: " <> e
     Right f -> export f
 
-convertKeepNote :: KeepJSON -> Either ParseError File
-convertKeepNote json = noteToFile <$> parseNote json
+convertKeepNote :: KeepJSON -> TimeZone -> Either ParseError File
+convertKeepNote json tz = noteToFile <$> parseNote json
+  where
+    noteToFile n =
+      File
+        { path = getNotePath n,
+          content = noteToMarkdown n tz,
+          lastModified = lastEditedTime (metadata n)
+        }
