@@ -1,5 +1,6 @@
 module MarkdownSpec (spec) where
 
+import Data.Time (TimeZone (..))
 import Markdown
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 import Parse (microTimestampToUTC)
@@ -9,10 +10,13 @@ spec :: Spec
 spec = do
   describe "noteToMarkdown" $ do
     it "converts a text note" $ do
-      noteToMarkdown basicNote `shouldBe` basicNoteMarkdown
+      noteToMarkdown basicNote pst `shouldBe` basicNoteMarkdown
 
     it "converts a checklist" $ do
-      noteToMarkdown checklist `shouldBe` checklistMarkdown
+      noteToMarkdown checklist pst `shouldBe` checklistMarkdown
+
+pst :: TimeZone
+pst = TimeZone {timeZoneSummerOnly = False, timeZoneMinutes = -480, timeZoneName = "PST"}
 
 basicNote :: Note
 basicNote =
@@ -31,7 +35,7 @@ basicNote =
     }
 
 basicNoteMarkdown :: Markdown
-basicNoteMarkdown = "---\ntags: [Language]\ncreatedTime: 2021-09-29T03:31:23Z\nlastEditedTime: 2021-09-29T03:32:23Z\n---\n\nI'm a note! :D"
+basicNoteMarkdown = "---\ntags: [Language]\ncreatedTime: 2021-09-28T19:31:23-08:00\nlastEditedTime: 2021-09-28T19:32:23-08:00\n---\n\nI'm a note! :D"
 
 checklist :: Note
 checklist =
@@ -57,4 +61,4 @@ checklist =
     }
 
 checklistMarkdown :: Markdown
-checklistMarkdown = "---\ntags: [Goals, Travel]\ncreatedTime: 2021-11-29T00:32:09Z\nlastEditedTime: 2021-11-29T00:54:01Z\n---\n\n# Trips\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"
+checklistMarkdown = "---\ntags: [Goals, Travel]\ncreatedTime: 2021-11-28T16:32:09-08:00\nlastEditedTime: 2021-11-28T16:54:01-08:00\n---\n\n# Trips\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"

@@ -5,30 +5,32 @@ module Markdown
 where
 
 import Data.Text qualified as T
-import Data.Time (UTCTime)
+import Data.Time (TimeZone, UTCTime, utcToZonedTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
 
 type Markdown = T.Text
 
-noteToMarkdown :: Note -> Markdown
-noteToMarkdown n =
-  metadataToMarkdown (metadata n)
+-- Convert a note to markdown. The time zone is used to display the timestamp
+-- metadata in the user's time zone, rather than the default of UTC.
+noteToMarkdown :: Note -> TimeZone -> Markdown
+noteToMarkdown n tz =
+  metadataToMarkdown (metadata n) tz
     <> "\n\n"
     <> titleToMarkdown (title n)
     <> contentToMarkdown (content n)
 
-metadataToMarkdown :: Metadata -> Markdown
-metadataToMarkdown m =
+metadataToMarkdown :: Metadata -> TimeZone -> Markdown
+metadataToMarkdown m tz =
   "---\n"
     <> "tags: "
     <> tagsToMarkdown (tags m)
     <> "\n"
     <> "createdTime: "
-    <> timeToMarkdown (createdTime m)
+    <> timeToMarkdown (createdTime m) tz
     <> "\n"
     <> "lastEditedTime: "
-    <> timeToMarkdown (lastEditedTime m)
+    <> timeToMarkdown (lastEditedTime m) tz
     <> "\n"
     <> "---"
 
@@ -49,6 +51,7 @@ listItemToMarkdown :: ChecklistItem -> Markdown
 listItemToMarkdown (ChecklistItem t True) = "- [x] " <> t
 listItemToMarkdown (ChecklistItem t False) = "- [ ] " <> t
 
--- TODO: use local time zone in output, probably? instead of UTC?
-timeToMarkdown :: UTCTime -> Markdown
-timeToMarkdown = T.pack . iso8601Show
+timeToMarkdown :: UTCTime -> TimeZone -> Markdown
+timeToMarkdown utcTime tz = T.pack $ iso8601Show zoned
+  where
+    zoned = utcToZonedTime tz utcTime
