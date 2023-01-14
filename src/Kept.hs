@@ -30,7 +30,7 @@ writeNoteFile (File fullNotePath content modified) = do
   let createParentDirs = True
   _ <- createDirectoryIfMissing createParentDirs noteDirectory
   -- Make sure we have a unique file name and write the file:
-  uniqueNotePath <- getUniqueFileName (keptOutputDir </> fullNotePath) 0
+  uniqueNotePath <- getUniqueFileName (keptOutputDir </> fullNotePath)
   putStrLn $ "Writing file to " <> uniqueNotePath
   TIO.writeFile uniqueNotePath content
   -- And finally, set the modification timestamp to match the note metadata:
@@ -40,13 +40,15 @@ writeNoteFile (File fullNotePath content modified) = do
 -- parenthetical number. Keep incrementing that number until the file doesn't
 -- exist. (Could also use metadata timestamp? But even that's not guaranteed to
 -- be unique.)
-getUniqueFileName :: FilePath -> Int -> IO FilePath
-getUniqueFileName file attemptNum = do
-  let fn = addNumberToFileName file attemptNum
-  fileAlreadyExists <- doesFileExist fn
-  if fileAlreadyExists
-    then getUniqueFileName file (attemptNum + 1)
-    else return fn
+getUniqueFileName :: FilePath -> IO FilePath
+getUniqueFileName f = go f 0
+  where
+    go file attemptNum = do
+      let fn = addNumberToFileName file attemptNum
+      fileAlreadyExists <- doesFileExist fn
+      if fileAlreadyExists
+        then go file (attemptNum + 1)
+        else return fn
 
 addNumberToFileName :: FilePath -> Int -> FilePath
 addNumberToFileName f 0 = f
