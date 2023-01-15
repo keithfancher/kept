@@ -22,37 +22,39 @@ type KeepJSON = T.Text
 -- Given the JSON for a single Google Keep note, attempt to parse out our
 -- internal Note type.
 parseNote :: KeepJSON -> Either ParseError Note
-parseNote json = mapNote <$> parseKeepJson json
+parseNote json = parseKeepJson json >>= mapNote
 
 -- First encode (utf8) Text to a ByteString. But Aeson requires a *lazy*
 -- ByteString, so we have to convert one more time.
 parseKeepJson :: KeepJSON -> Either ParseError KeepNote
 parseKeepJson = eitherDecode . B.fromStrict . encodeUtf8
 
-mapNote :: KeepNote -> Note
-mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _) =
-  Note
-    { metadata =
-        Metadata
-          { tags = mapLabels labels,
-            lastEditedTime = microTimestampToUTC edited,
-            createdTime = microTimestampToUTC created,
-            isArchived = archive,
-            isPinned = pinned,
-            isTrashed = trash
-          },
-      title = case noteTitle of
-        "" -> Nothing
-        nonEmpty -> Just nonEmpty,
-      content = mapNoteContent note
-    }
+mapNote :: KeepNote -> Either ParseError Note
+mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _) = do
+  noteContent <- mapNoteContent note
+  return
+    Note
+      { metadata =
+          Metadata
+            { tags = mapLabels labels,
+              lastEditedTime = microTimestampToUTC edited,
+              createdTime = microTimestampToUTC created,
+              isArchived = archive,
+              isPinned = pinned,
+              isTrashed = trash
+            },
+        title = case noteTitle of
+          "" -> Nothing
+          nonEmpty -> Just nonEmpty,
+        content = noteContent
+      }
 
--- Note that note content must be text OR a checklist, but NOT both.
-mapNoteContent :: KeepNote -> NoteContent
+mapNoteContent :: KeepNote -> Either ParseError NoteContent
 mapNoteContent n = case (textContent n, listContent n) of
-  (Just textContent, Nothing) -> Text textContent
-  (Nothing, Just listContent) -> Checklist $ map mapChecklistItem listContent
-  _ -> error "invalid case" -- TODO: Use eithers, return a left
+  (Just textContent, Nothing) -> Right $ Text textContent
+  (Nothing, Just listContent) -> Right $ Checklist $ map mapChecklistItem listContent
+  -- Any other case is technically not even possible? In theory...
+  _ -> Left "Invalid JSON input: must contain a list or text, but not both"
 
 mapChecklistItem :: KeepListItem -> ChecklistItem
 mapChecklistItem (KeepListItem t c) = ChecklistItem t c
