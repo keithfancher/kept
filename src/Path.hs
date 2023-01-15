@@ -3,6 +3,7 @@ module Path
   )
 where
 
+import Data.List (sort)
 import Data.Text qualified as T
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
 import System.FilePath (makeValid, (</>))
@@ -66,4 +67,4 @@ noteSubDir (Metadata _ _ _ True _ _) = "trash"
 noteSubDir (Metadata _ _ _ _ _ True) = "archive"
 noteSubDir (Metadata _ _ _ _ True _) = "pinned"
 noteSubDir (Metadata _ _ [] _ _ _) = "untagged"
-noteSubDir (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" tags -- TODO: sort tags (case sens?)
+noteSubDir (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" (sort tags)

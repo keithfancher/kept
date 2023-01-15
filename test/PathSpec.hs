@@ -17,6 +17,9 @@ spec = do
     it "generates the correct path for an untitled checklist" $ do
       getNotePath untitledChecklist `shouldBe` "Lists/vim, neovim, vs code, sublime, ed.md"
 
+    it "generates the correct path for note with multiple tags" $ do
+      getNotePath multiTagNote `shouldBe` "Important-Tasks/Memo to myself.md"
+
 basicNote :: Note
 basicNote =
   Note
@@ -77,4 +80,20 @@ untitledChecklist =
             ChecklistItem "sublime" False,
             ChecklistItem "ed" False
           ]
+    }
+
+multiTagNote :: Note
+multiTagNote =
+  Note
+    { metadata =
+        Metadata
+          { tags = ["Tasks", "Important"],
+            lastEditedTime = microTimestampToUTC 1638147241847000,
+            createdTime = microTimestampToUTC 1638145929577000,
+            isTrashed = False,
+            isPinned = False,
+            isArchived = False
+          },
+      title = Just "Memo to myself",
+      content = Text "Do the dumb things I gotta do"
     }
