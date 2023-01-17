@@ -5,7 +5,7 @@ where
 
 import Data.List (sort)
 import Data.Text qualified as T
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), unTag)
 import System.FilePath (makeValid, (</>))
 
 -- The logic to determine the file path for a given note.
@@ -67,4 +67,6 @@ noteSubDir (Metadata _ _ _ True _ _) = "trash"
 noteSubDir (Metadata _ _ _ _ _ True) = "archive"
 noteSubDir (Metadata _ _ _ _ True _) = "pinned"
 noteSubDir (Metadata _ _ [] _ _ _) = "untagged"
-noteSubDir (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" (sort tags)
+noteSubDir (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" $ sortTags tags
+  where
+    sortTags = sort . map unTag

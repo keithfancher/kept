@@ -2,7 +2,7 @@ module MarkdownSpec (spec) where
 
 import Data.Time (TimeZone (..))
 import Markdown
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), mkTags)
 import Parse (microTimestampToUTC)
 import Test.Hspec
 
@@ -23,7 +23,7 @@ basicNote =
   Note
     { metadata =
         Metadata
-          { tags = ["Language"],
+          { tags = mkTags ["Language"],
             lastEditedTime = microTimestampToUTC 1632886343121000,
             createdTime = microTimestampToUTC 1632886283906000,
             isTrashed = False,
@@ -42,7 +42,7 @@ checklist =
   Note
     { metadata =
         Metadata
-          { tags = ["Goals", "Travel"],
+          { tags = mkTags ["Goals", "Travel"],
             lastEditedTime = microTimestampToUTC 1638147241847000,
             createdTime = microTimestampToUTC 1638145929577000,
             isTrashed = False,

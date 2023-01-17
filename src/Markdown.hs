@@ -7,7 +7,7 @@ where
 import Data.Text qualified as T
 import Data.Time (TimeZone, UTCTime, utcToZonedTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, unTag)
 
 type Markdown = T.Text
 
@@ -37,7 +37,8 @@ metadataToMarkdown m tz =
 tagsToMarkdown :: [Tag] -> Markdown
 tagsToMarkdown t = "[" <> commaSeparated <> "]"
   where
-    commaSeparated = T.intercalate ", " t
+    commaSeparated = T.intercalate ", " $ tagsAsText t
+    tagsAsText = map unTag
 
 titleToMarkdown :: Maybe T.Text -> Markdown
 titleToMarkdown Nothing = ""

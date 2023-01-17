@@ -2,7 +2,7 @@ module ParseSpec (spec) where
 
 import Data.Either (isLeft)
 import Data.Text qualified as T
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..))
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), mkTags)
 import Parse
 import Test.Hspec
 
@@ -26,7 +26,7 @@ basicNoteOutput =
   Note
     { metadata =
         Metadata
-          { tags = ["Language"],
+          { tags = mkTags ["Language"],
             lastEditedTime = microTimestampToUTC 1632886343121000,
             createdTime = microTimestampToUTC 1632886283906000,
             isTrashed = False,
@@ -45,7 +45,7 @@ checklistOutput =
   Note
     { metadata =
         Metadata
-          { tags = ["Goals", "Travel"],
+          { tags = mkTags ["Goals", "Travel"],
             lastEditedTime = microTimestampToUTC 1638147241847000,
             createdTime = microTimestampToUTC 1638145929577000,
             isTrashed = False,

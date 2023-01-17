@@ -13,7 +13,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Time (UTCTime)
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import GHC.Generics (Generic)
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag)
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, mkTag)
 
 type ParseError = String
 
@@ -61,7 +61,9 @@ mapChecklistItem (KeepListItem t c) = ChecklistItem t c
 
 mapLabels :: Maybe [KeepLabel] -> [Tag]
 mapLabels Nothing = []
-mapLabels (Just labels) = map name labels
+mapLabels (Just labels) = map tagify labels
+  where
+    tagify = mkTag . name
 
 -- Input data has a microsecond timestamp, convert to `UTCTime`.
 microTimestampToUTC :: Int -> UTCTime
