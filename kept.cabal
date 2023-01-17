@@ -72,6 +72,7 @@ test-suite kept-test
   main-is: Spec.hs
   other-modules:
       MarkdownSpec
+      NoteSpec
       ParseSpec
       PathSpec
       Paths_kept
