@@ -6,8 +6,8 @@ where
 
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
-import Data.Time (TimeZone, UTCTime, getCurrentTimeZone)
-import Markdown (noteToMarkdown)
+import Data.Time (UTCTime)
+import Markdown (noteToMarkdownSystemTZ)
 import Note (Metadata (..), Note (..))
 import Parse (KeepJSON, ParseError, parseNote)
 import Path (getNotePath)
@@ -77,20 +77,20 @@ printNoteFile (File path content _) = do
 exportNote :: FilePath -> (File -> IO ()) -> IO ()
 exportNote jsonPath export = do
   json <- TIO.readFile jsonPath
-  -- TODO: subtle bug here -- will apply the CURRENT daylight savings state to
-  -- the timestamp, rather than what it would have been at that time. Maybe do
-  -- something with `utcToLocalZonedTime`?
-  tz <- getCurrentTimeZone
-  case convertKeepNote json tz of
+  noteFile <- convertKeepNote json
+  case noteFile of
     Left e -> putStrLn $ "Error: " <> e
     Right f -> export f
 
-convertKeepNote :: KeepJSON -> TimeZone -> Either ParseError File
-convertKeepNote json tz = noteToFile <$> parseNote json
-  where
-    noteToFile n =
-      File
-        { path = getNotePath n,
-          content = noteToMarkdown n tz,
-          lastModified = lastEditedTime (metadata n)
-        }
+convertKeepNote :: KeepJSON -> IO (Either ParseError File)
+convertKeepNote json = mapM noteToFile (parseNote json)
+
+noteToFile :: Note -> IO File
+noteToFile n = do
+  markdown <- noteToMarkdownSystemTZ n
+  return
+    File
+      { path = getNotePath n,
+        content = markdown,
+        lastModified = lastEditedTime (metadata n)
+      }

@@ -15,8 +15,10 @@ spec = do
     it "converts a checklist" $ do
       noteToMarkdown checklist pst `shouldBe` checklistMarkdown
 
-pst :: TimeZone
-pst = TimeZone {timeZoneSummerOnly = False, timeZoneMinutes = -480, timeZoneName = "PST"}
+pst :: TimeZones
+pst = TimeZones {createdTz = pstWinter, editedTz = pstWinter}
+  where
+    pstWinter = TimeZone {timeZoneSummerOnly = False, timeZoneMinutes = -480, timeZoneName = "PST"}
 
 basicNote :: Note
 basicNote =

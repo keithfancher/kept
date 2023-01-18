@@ -1,36 +1,60 @@
 module Markdown
   ( Markdown,
+    TimeZones (..),
     noteToMarkdown,
+    noteToMarkdownSystemTZ,
   )
 where
 
 import Data.Text qualified as T
-import Data.Time (TimeZone, UTCTime, utcToZonedTime)
+import Data.Time (TimeZone, UTCTime, getTimeZone, utcToZonedTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
 import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, unTag)
 
 type Markdown = T.Text
 
--- Convert a note to markdown. The time zone is used to display the timestamp
+-- Wrapper for our the *two* time zones we need in order to properly localize
+-- these two timestamps. Annoying! See the docs for `noteToMarkdownSystemTZ`
+-- below for some more context.
+data TimeZones = TimeZones
+  { createdTz :: TimeZone,
+    editedTz :: TimeZone
+  }
+
+-- Convert a note to markdown. The time zones are used to display the timestamp
 -- metadata in the user's time zone, rather than the default of UTC.
-noteToMarkdown :: Note -> TimeZone -> Markdown
+noteToMarkdown :: Note -> TimeZones -> Markdown
 noteToMarkdown n tz =
   metadataToMarkdown (metadata n) tz
     <> "\n\n"
     <> titleToMarkdown (title n)
     <> contentToMarkdown (content n)
 
-metadataToMarkdown :: Metadata -> TimeZone -> Markdown
-metadataToMarkdown m tz =
+-- Addresses a subtle bug with daylight savings, aka "summer time". We can't
+-- just get the system time zone, we have to get a *different* system time zone
+-- for each distinct DateTime. In other words, what would our *current* time
+-- zone have been at *that* point in time?
+noteToMarkdownSystemTZ :: Note -> IO Markdown
+noteToMarkdownSystemTZ n = do
+  createdTz <- getTimeZone $ created n
+  editedTz <- getTimeZone $ edited n
+  let tz = TimeZones {createdTz = createdTz, editedTz = editedTz}
+  return $ noteToMarkdown n tz
+  where
+    created = createdTime . metadata
+    edited = lastEditedTime . metadata
+
+metadataToMarkdown :: Metadata -> TimeZones -> Markdown
+metadataToMarkdown m (TimeZones createdTz editedTz) =
   "---\n"
     <> "tags: "
     <> tagsToMarkdown (tags m)
     <> "\n"
     <> "createdTime: "
-    <> timeToMarkdown (createdTime m) tz
+    <> timeToMarkdown (createdTime m) createdTz
     <> "\n"
     <> "lastEditedTime: "
-    <> timeToMarkdown (lastEditedTime m) tz
+    <> timeToMarkdown (lastEditedTime m) editedTz
     <> "\n"
     <> "---"
 
