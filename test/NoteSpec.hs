@@ -19,6 +19,9 @@ spec = do
     it "creates valid tags with unicode characters" $ do
       mkTagText "大事な事!!!" `shouldBe` "大事な事"
 
+    it "adds an extra character to number-only tags to make them valid" $ do
+      mkTagText "2020!!!" `shouldBe` "2020-"
+
 -- Helper to make testing these outputs easier. Transform the Text to a Tag,
 -- then pull Text back out.
 mkTagText :: T.Text -> T.Text

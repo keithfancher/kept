@@ -10,7 +10,7 @@ module Note
   )
 where
 
-import Data.Char (isAlphaNum)
+import Data.Char (isAlphaNum, isNumber)
 import Data.Text qualified as T
 import Data.Time (UTCTime)
 
@@ -46,18 +46,28 @@ newtype Tag = UnsafeTag T.Text
 
 -- 1. Replace a certain subset of characters
 -- 2. Remove anything else that isn't "valid" (by Obsidian's tag rules)
--- 3. Construct the Tag
---
--- TODO: Obsidian doesn't like tags that are all numeric. Do something dumb
--- like stick a `-` at the end of such tags.
+-- 3. If what's left is *only* numeric, add an extra char to make it a valid tag
+-- 4. Actually construct the `Tag`
 mkTag :: T.Text -> Tag
-mkTag = UnsafeTag . removeInvalid . replaceInvalid
+mkTag = UnsafeTag . fixNumericTags . removeInvalid . replaceInvalid
 
 unTag :: Tag -> T.Text
 unTag (UnsafeTag t) = t
 
 mkTags :: [T.Text] -> [Tag]
 mkTags = map mkTag
+
+-- Obsidian doesn't like tags that are all numeric. If we see a tag that's ONLY
+-- numbers, stick a `-` character at the end of it to make it valid. Not the
+-- most elegant solution, but the user can easily rename the tag
+-- after-the-fact.
+fixNumericTags :: T.Text -> T.Text
+fixNumericTags t =
+  if isAllNumeric t
+    then t <> "-"
+    else t
+  where
+    isAllNumeric = T.all isNumber -- `isNumber` also checks for fancy unicode numbers!
 
 -- Replace a certain subset of characters with something else.
 replaceInvalid :: T.Text -> T.Text
