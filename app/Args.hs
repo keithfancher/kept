@@ -7,7 +7,7 @@ where
 import Options.Applicative
 
 data KeptOptions = KeptOptions
-  { stdIO :: Bool,
+  { stdOut :: Bool,
     inFiles :: [FilePath]
   }
 
@@ -23,13 +23,13 @@ cliOptParser =
 keptOptionParser :: Parser KeptOptions
 keptOptionParser =
   KeptOptions
-    <$> stdIOFlagParser
+    <$> stdOutFlagParser
     <*> filePathsParser
 
-stdIOFlagParser :: Parser Bool
-stdIOFlagParser =
+stdOutFlagParser :: Parser Bool
+stdOutFlagParser =
   switch
-    ( long "stdio"
+    ( long "stdout"
         <> short 's'
         <> help "..." -- TODO
     )

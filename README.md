@@ -48,7 +48,7 @@ $ kept ~/Takeout/Keep/Todo.json
 # other random files in your Google Takeout export.)
 $ kept ~/Takeout/Keep/*.json
 
-# Use the `-s` (or `--stdio`) option to print the converted markdown content
+# Use the `-s` (or `--stdout`) option to print the converted markdown content
 # to stdout rather than writing to a file. Useful to preview how a note would
 # look, if you're curious:
 $ kept -s "~/Takeout/Keep/Great Ideas.json"
