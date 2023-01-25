@@ -10,7 +10,7 @@ import Data.Time (UTCTime)
 import Markdown (noteToMarkdownSystemTZ)
 import Note (Metadata (..), Note (..))
 import Parse (KeepJSON, ParseError, parseNote)
-import Path (getNotePath)
+import Path (PathOptions (..), getNotePath)
 import System.Directory (createDirectoryIfMissing, doesFileExist, setModificationTime)
 import System.FilePath (dropExtension, takeDirectory, takeExtension, (</>))
 
@@ -90,7 +90,7 @@ noteToFile n = do
   markdown <- noteToMarkdownSystemTZ n
   return
     File
-      { path = getNotePath n,
+      { path = getNotePath n TagSubDirs,
         content = markdown,
         lastModified = lastEditedTime (metadata n)
       }

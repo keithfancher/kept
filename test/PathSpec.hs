@@ -9,16 +9,19 @@ spec :: Spec
 spec = do
   describe "getNotePath" $ do
     it "generates the correct path for an untitled text note" $ do
-      getNotePath basicNote `shouldBe` "Language/I'm a note! :D.md"
+      getNotePath basicNote TagSubDirs `shouldBe` "Language/I'm a note! :D.md"
 
     it "generates the correct path when note has a path delimiter in the title" $ do
-      getNotePath checklist `shouldBe` "pinned/Trips-To Live.md"
+      getNotePath checklist TagSubDirs `shouldBe` "pinned/Trips-To Live.md"
 
     it "generates the correct path for an untitled checklist" $ do
-      getNotePath untitledChecklist `shouldBe` "Lists/vim, neovim, vs code, sublime, ed.md"
+      getNotePath untitledChecklist TagSubDirs `shouldBe` "Lists/vim, neovim, vs code, sublime, ed.md"
 
     it "generates the correct path for note with multiple tags" $ do
-      getNotePath multiTagNote `shouldBe` "Important-Tasks/Memo to myself.md"
+      getNotePath multiTagNote TagSubDirs `shouldBe` "Important-Tasks/Memo to myself.md"
+
+    it "generates a path without tag-based subdirectories" $ do
+      getNotePath multiTagNote NoTagSubDirs `shouldBe` "all-notes/Memo to myself.md"
 
 basicNote :: Note
 basicNote =

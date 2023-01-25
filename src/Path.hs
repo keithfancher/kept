@@ -1,19 +1,24 @@
 module Path
-  ( getNotePath,
+  ( PathOptions (..),
+    getNotePath,
   )
 where
 
 import Data.List (sort)
 import Data.Text qualified as T
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), unTag)
+import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, unTag)
 import System.FilePath (makeValid, (</>))
 
+data PathOptions
+  = TagSubDirs -- Create a subdirectory for the note based on its tag(s)
+  | NoTagSubDirs -- Dump all notes into the same directory structure regardless of tag
+
 -- The logic to determine the file path for a given note.
-getNotePath :: Note -> FilePath
-getNotePath n = makeValid filenameWithPath
+getNotePath :: Note -> PathOptions -> FilePath
+getNotePath n pathOpts = makeValid filenameWithPath
   where
     filenameWithPath = subdir </> noteFilename n
-    subdir = noteSubDir (metadata n)
+    subdir = noteSubDir (metadata n) pathOpts
 
 -- Get the filename for a note. NOT the full path. See also `noteSubDir`, below.
 noteFilename :: Note -> FilePath
@@ -56,17 +61,20 @@ titleLength = 45
 
 -- Sort the notes into subdirectories. Prioritize trash, archive, and pinned.
 -- (In that order. For example, if a note is trashed, we don't care about its
--- tags, or that it's pinned.) After that, use a sorted combo of tags for
--- subdirs. Works best if notes only had a single label in Keep, obviously.
---
--- TODO: could split by year? add option for NO subdirs, depending on your
--- software that might be easiest. (Just use the tag metadata to sort through
--- your notes.)
-noteSubDir :: Metadata -> FilePath
-noteSubDir (Metadata _ _ _ True _ _) = "trash"
-noteSubDir (Metadata _ _ _ _ _ True) = "archive"
-noteSubDir (Metadata _ _ _ _ True _) = "pinned"
-noteSubDir (Metadata _ _ [] _ _ _) = "untagged"
-noteSubDir (Metadata _ _ tags _ _ _) = T.unpack $ T.intercalate "-" $ sortTags tags
+-- tags, or that it's pinned.)
+noteSubDir :: Metadata -> PathOptions -> FilePath
+noteSubDir (Metadata _ _ _ True _ _) _ = "trash"
+noteSubDir (Metadata _ _ _ _ _ True) _ = "archive"
+noteSubDir (Metadata _ _ _ _ True _) _ = "pinned"
+-- If not trashed/archive/pinned, check the tag-based path options:
+noteSubDir _ NoTagSubDirs = "all-notes"
+noteSubDir m TagSubDirs = subDirFromTags $ tags m
+
+-- Use a sorted combo of tags if the user has opted for tag-based
+-- subdirectories. Works best if notes only had a single label in Keep,
+-- obviously.
+subDirFromTags :: [Tag] -> FilePath
+subDirFromTags [] = "untagged"
+subDirFromTags tags = T.unpack $ T.intercalate "-" $ sortTags tags
   where
     sortTags = sort . map unTag
