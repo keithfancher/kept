@@ -5,9 +5,11 @@ module Args
 where
 
 import Options.Applicative
+import Path (PathOptions (..))
 
 data KeptOptions = KeptOptions
   { stdOut :: Bool,
+    pathOptions :: PathOptions,
     inFiles :: [FilePath]
   }
 
@@ -24,6 +26,7 @@ keptOptionParser :: Parser KeptOptions
 keptOptionParser =
   KeptOptions
     <$> stdOutFlagParser
+    <*> tagPathFlagParser
     <*> filePathsParser
 
 stdOutFlagParser :: Parser Bool
@@ -33,6 +36,20 @@ stdOutFlagParser =
         <> short 's'
         <> help "Print output to screen rather than writing files"
     )
+
+tagPathFlagParser :: Parser PathOptions
+tagPathFlagParser =
+  toPathOpt
+    <$> switch
+      ( long "no-tag-subdirs"
+          <> short 'n'
+          <> help "Do not sort notes into tag-based subdirectories"
+      )
+  where
+    -- This is a bit confusing because of the negation. These `switch` options
+    -- are False by default, so that needs to map to our default desired behavior:
+    toPathOpt False = TagSubDirs
+    toPathOpt True = NoTagSubDirs
 
 -- We get these in from the CLI as a list of paths, but need to transform it
 -- into `InFiles`, the actually-useful type.

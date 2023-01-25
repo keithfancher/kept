@@ -6,13 +6,13 @@ import Options.Applicative (execParser)
 
 main :: IO ()
 main = do
-  (KeptOptions stdOut inFiles) <- execParser cliOptParser
+  (KeptOptions stdOut pathOpts inFiles) <- execParser cliOptParser
   if stdOut
-    then mapM_ printNoteWithPadding inFiles
-    else mapM_ exportNoteToFile inFiles
+    then mapM_ (printNoteWithPadding pathOpts) inFiles
+    else mapM_ (exportNoteToFile pathOpts) inFiles
   putStrLn "Export complete!"
   where
-    printNoteWithPadding f = do
+    printNoteWithPadding pathOpts f = do
       putStrLn "-----------------------------------------------------------\n"
-      exportNoteToStdOut f
+      exportNoteToStdOut pathOpts f
       putStrLn ""

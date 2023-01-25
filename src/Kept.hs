@@ -28,12 +28,12 @@ keptOutputDir = "kept-output"
 
 -- Reads the exported Google Keep json from the given file path, converts it to
 -- markdown, and writes a new file.
-exportNoteToFile :: FilePath -> IO ()
-exportNoteToFile jsonPath = exportNote jsonPath writeNoteFile
+exportNoteToFile :: PathOptions -> FilePath -> IO ()
+exportNoteToFile pathOpts jsonPath = exportNote pathOpts jsonPath writeNoteFile
 
 -- Same thing, but just writes path and contents to STDOUT instead of a file.
-exportNoteToStdOut :: FilePath -> IO ()
-exportNoteToStdOut jsonPath = exportNote jsonPath printNoteFile
+exportNoteToStdOut :: PathOptions -> FilePath -> IO ()
+exportNoteToStdOut pathOpts jsonPath = exportNote pathOpts jsonPath printNoteFile
 
 writeNoteFile :: File -> IO ()
 writeNoteFile (File fullNotePath content modified) = do
@@ -74,23 +74,23 @@ printNoteFile (File path content _) = do
   putStrLn $ "NOTE PATH:\n" <> path <> "\n\n" <> "NOTE CONTENT:"
   TIO.putStrLn content
 
-exportNote :: FilePath -> (File -> IO ()) -> IO ()
-exportNote jsonPath export = do
+exportNote :: PathOptions -> FilePath -> (File -> IO ()) -> IO ()
+exportNote pathOpts jsonPath export = do
   json <- TIO.readFile jsonPath
-  noteFile <- convertKeepNote json
+  noteFile <- convertKeepNote pathOpts json
   case noteFile of
     Left e -> putStrLn $ "Error: " <> e
     Right f -> export f
 
-convertKeepNote :: KeepJSON -> IO (Either ParseError File)
-convertKeepNote json = mapM noteToFile (parseNote json)
+convertKeepNote :: PathOptions -> KeepJSON -> IO (Either ParseError File)
+convertKeepNote pathOpts json = mapM (noteToFile pathOpts) (parseNote json)
 
-noteToFile :: Note -> IO File
-noteToFile n = do
+noteToFile :: PathOptions -> Note -> IO File
+noteToFile pathOpts n = do
   markdown <- noteToMarkdownSystemTZ n
   return
     File
-      { path = getNotePath n TagSubDirs,
+      { path = getNotePath n pathOpts,
         content = markdown,
         lastModified = lastEditedTime (metadata n)
       }
