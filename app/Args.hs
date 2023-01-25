@@ -17,7 +17,7 @@ cliOptParser =
     (keptOptionParser <**> helper)
     ( fullDesc
         <> header "kept: Extract your data from Google Keep."
-        <> progDesc "TODO: do a thing, give it your JSON files, etc" -- TODO
+        <> progDesc "Pass in one or more of your exported Google Keep JSON files and get some nice markdown in return. Export your Keep JSON data via takeout.google.com."
     )
 
 keptOptionParser :: Parser KeptOptions
@@ -31,7 +31,7 @@ stdOutFlagParser =
   switch
     ( long "stdout"
         <> short 's'
-        <> help "..." -- TODO
+        <> help "Print output to screen rather than writing files"
     )
 
 -- We get these in from the CLI as a list of paths, but need to transform it
@@ -42,6 +42,6 @@ filePathsParser =
     ( argument
         str
         ( metavar "JSON_FILE(S)"
-            <> help "..." -- TODO
+            <> help "One or more exported Google Keep JSON files"
         )
     )
