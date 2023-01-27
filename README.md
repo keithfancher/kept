@@ -14,14 +14,17 @@ editor](https://neovim.io/)).
 - Converts Keep "labels" into tags that are [fully compatible with
   Obsidian](https://help.obsidian.md/How+to/Working+with+tags#Allowed+characters)
 - Preserves note metadata: `createdTime` and `lastEditedTime` are included in
-  the notes' [YAML front
-  matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter), as well
-  as its tags
+  each note's [YAML front
+  matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter), and so
+  are its tags
 - Filesystem metadata is also updated, i.e. the `lastEditedTime` for each note
-  will be reflected in the created files' "last modified time"
+  will be reflected in the created file's "last modified time"
 - Exported notes are sorted into subdirectories based on label, archive/trash
   status, and "pinned" status
-- Untitled notes are given file names generated from note content
+- Untitled notes are given filenames generated from note content, rather than
+  Google's default "timestamp-as-title" approach
+
+**STILL TODO:** Handle notes with media attachments (audio/images).
 
 
 ## Quick-start
@@ -39,7 +42,7 @@ Once you've got a directory full of exported Google Keep JSON, you can convert
 ```
 # This will convert a single note. By default, the markdown output will be
 # written to a file in the `kept-output` directory, relative to your current
-# working directory. More details below re: the  full path of this file and
+# working directory. More details below re: the full path of this file and
 # its name.
 $ kept ~/Takeout/Keep/Todo.json
 
@@ -92,6 +95,69 @@ To uninstall, simply remove the `kept` binary from wherever you installed it.
 I haven't built any binary releases yet. Coming soon!
 
 
-## More details?
+## Paths of exported notes
 
-...are coming soon!
+`kept` will sort your notes into subdirectories based on certain criteria:
+
+1. If a note is in Keep's `Trash`, `Archive`, or is `Pinned`, it will go into
+   the `trash`, `archive`, or `pinned` subdirectory as appropriate. Those
+   statuses are checked *in that order*. (In other words, if a note is
+   "pinned" and you move it to the trash in Keep, then export your notes,
+   `kept` will put that note in the `trash` subdirectory.)
+2. By default, any note which isn't trashed, archived, or pinned is put into a
+   subdirectory named for that note's label/tag.
+
+Tags-as-subdirectories works great if you used Keep labels like folders, but
+gets a little messier for notes with multiple labels. In that case, `kept`
+will sort the labels and connect them with dashes. Notes with the same set of
+labels will go in the same subdirectory.
+
+(For example, if a note has the `Important` and `Dumb` labels, we'll put it
+into the `Dumb-Important` subdirectory.)
+
+Note that you can disable this behavior with the `--no-tag-subdirs` CLI
+option. See "Options" below for more detail.
+
+
+## Note contents / Front-matter
+
+Google Keep notes don't contain formatting, so each note's contents will be
+exported more-or-less as-is. If a note has a title, that title will be written
+as a top-level markdown heading. (The title is also used as a filename for the
+note.) Checklists are converted into standard markdown checklists.
+
+By default, each note's metadata will be included as YAML front-matter at the
+top of the file. (Many common editors support this, including Obsidian and
+Markor.) The included front-matter fields are: `tags`, `createdTime`, and
+`lastEditedTime`.
+
+You can disable the YAML front-matter entirely with the `--no-yaml` CLI
+option. (See the "Options" section below.) Note that if you do, it might make
+it harder for your editor-of-choice to determine the tag(s) of your notes. (If
+you've let `kept` sort them into subdirectories, that might not matter.)
+
+
+## Filesystem metadata
+
+`kept` will also update each created file's "last modified date", assuming
+your filesystem supports this. (Most do.) This means your normal file-explorer
+tools -- and tools like Obsidian -- can sort by recently-modified, find notes
+from a specific date range, etc.
+
+Note that this is *totally independent* from the metadata stored in a note's
+YAML front-matter. In other words, you can disable the YAML front-matter and
+still be confident that your notes will be date-and-time sortable, searchable,
+and so on.
+
+
+## Options / Flags
+
+- `--stdout` / `-s`: Print output to screen rather than writing files. Useful
+  to preview the results of an export.
+- `--no-tag-subdirs` / `-t`: Do not sort notes into tag-based subdirectories.
+  Notes will still be sorted into `trash`, `archive`, and `pinned`, but all
+  *remaining* notes will go into a single `all-notes` subdirectory.
+- `--no-yaml` / `-y`: Do *not* add YAML front-matter to exported notes. By
+  default, each note will have `tags`, `createdTime`, and `lastEditedTime`
+  properties included in its YAML front-matter. This option leaves out the
+  front-matter entirely.
