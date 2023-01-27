@@ -22,7 +22,8 @@ keptOutputDir = "kept-output"
 
 data KeptOptions = KeptOptions
   { stdOut :: Bool,
-    pathOptions :: PathOptions
+    pathOptions :: PathOptions,
+    markdownOptions :: MarkdownOpts
   }
 
 -- Simple container for text that lives at some filepath.
@@ -33,25 +34,25 @@ data File = File
   }
 
 exportNotes :: KeptOptions -> [FilePath] -> IO ()
-exportNotes (KeptOptions stdOut pathOpts) inFiles = do
+exportNotes opts@(KeptOptions stdOut _ _) inFiles = do
   if stdOut
-    then mapM_ (printNoteWithPadding pathOpts) inFiles
-    else mapM_ (exportNoteToFile pathOpts) inFiles
+    then mapM_ (printNoteWithPadding opts) inFiles
+    else mapM_ (exportNoteToFile opts) inFiles
   putStrLn "Export complete!"
   where
-    printNoteWithPadding opts f = do
+    printNoteWithPadding o f = do
       putStrLn "-----------------------------------------------------------\n"
-      exportNoteToStdOut opts f
+      exportNoteToStdOut o f
       putStrLn ""
 
 -- Reads the exported Google Keep json from the given file path, converts it to
 -- markdown, and writes a new file.
-exportNoteToFile :: PathOptions -> FilePath -> IO ()
-exportNoteToFile pathOpts jsonPath = exportNote pathOpts jsonPath writeNoteFile
+exportNoteToFile :: KeptOptions -> FilePath -> IO ()
+exportNoteToFile opts jsonPath = exportNote opts jsonPath writeNoteFile
 
 -- Same thing, but just writes path and contents to STDOUT instead of a file.
-exportNoteToStdOut :: PathOptions -> FilePath -> IO ()
-exportNoteToStdOut pathOpts jsonPath = exportNote pathOpts jsonPath printNoteFile
+exportNoteToStdOut :: KeptOptions -> FilePath -> IO ()
+exportNoteToStdOut opts jsonPath = exportNote opts jsonPath printNoteFile
 
 writeNoteFile :: File -> IO ()
 writeNoteFile (File fullNotePath content modified) = do
@@ -92,20 +93,20 @@ printNoteFile (File path content _) = do
   putStrLn $ "NOTE PATH:\n" <> path <> "\n\n" <> "NOTE CONTENT:"
   TIO.putStrLn content
 
-exportNote :: PathOptions -> FilePath -> (File -> IO ()) -> IO ()
-exportNote pathOpts jsonPath export = do
+exportNote :: KeptOptions -> FilePath -> (File -> IO ()) -> IO ()
+exportNote opts jsonPath export = do
   json <- TIO.readFile jsonPath
-  noteFile <- convertKeepNote pathOpts json
+  noteFile <- convertKeepNote opts json
   case noteFile of
     Left e -> putStrLn $ "Error: " <> e
     Right f -> export f
 
-convertKeepNote :: PathOptions -> KeepJSON -> IO (Either ParseError File)
-convertKeepNote pathOpts json = mapM (noteToFile pathOpts) (parseNote json)
+convertKeepNote :: KeptOptions -> KeepJSON -> IO (Either ParseError File)
+convertKeepNote opts json = mapM (noteToFile opts) (parseNote json)
 
-noteToFile :: PathOptions -> Note -> IO File
-noteToFile pathOpts n = do
-  markdown <- noteToMarkdownSystemTZ YamlFrontMatter n
+noteToFile :: KeptOptions -> Note -> IO File
+noteToFile (KeptOptions _ pathOpts mdOpts) n = do
+  markdown <- noteToMarkdownSystemTZ mdOpts n
   return
     File
       { path = getNotePath n pathOpts,

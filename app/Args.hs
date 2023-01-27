@@ -5,6 +5,7 @@ module Args
 where
 
 import Kept (KeptOptions (..))
+import Markdown (MarkdownOpts (..))
 import Options.Applicative
 import Path (PathOptions (..))
 
@@ -33,6 +34,7 @@ keptOptionParser =
   KeptOptions
     <$> stdOutFlagParser
     <*> tagPathFlagParser
+    <*> frontMatterFlagParser
 
 stdOutFlagParser :: Parser Bool
 stdOutFlagParser =
@@ -47,7 +49,7 @@ tagPathFlagParser =
   toPathOpt
     <$> switch
       ( long "no-tag-subdirs"
-          <> short 'n'
+          <> short 't'
           <> help "Do not sort notes into tag-based subdirectories"
       )
   where
@@ -55,6 +57,19 @@ tagPathFlagParser =
     -- are False by default, so that needs to map to our default desired behavior:
     toPathOpt False = TagSubDirs
     toPathOpt True = NoTagSubDirs
+
+frontMatterFlagParser :: Parser MarkdownOpts
+frontMatterFlagParser =
+  toYamlOpt
+    <$> switch
+      ( long "no-yaml"
+          <> short 'y'
+          <> help "Do not add YAML front-matter to exported notes"
+      )
+  where
+    -- Same as the path flag -- a big confusing, but you get the idea.
+    toYamlOpt False = YamlFrontMatter
+    toYamlOpt True = NoFrontMatter
 
 filePathsParser :: Parser [FilePath]
 filePathsParser =
