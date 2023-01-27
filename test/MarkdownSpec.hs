@@ -10,10 +10,17 @@ spec :: Spec
 spec = do
   describe "noteToMarkdown" $ do
     it "converts a text note" $ do
-      noteToMarkdown basicNote pst `shouldBe` basicNoteMarkdown
+      let opts = YamlFrontMatter
+      noteToMarkdown opts basicNote pst `shouldBe` basicNoteMarkdown
 
     it "converts a checklist" $ do
-      noteToMarkdown checklist pst `shouldBe` checklistMarkdown
+      let opts = YamlFrontMatter
+      noteToMarkdown opts checklist pst `shouldBe` checklistMarkdown
+
+    it "converts a text note with no YAML front-matter" $ do
+      let opts = NoFrontMatter
+      noteToMarkdown opts basicNote pst `shouldBe` "I'm a note! :D"
+
 
 pst :: TimeZones
 pst = TimeZones {createdTz = pstWinter, editedTz = pstWinter}

@@ -1,5 +1,6 @@
 module Markdown
   ( Markdown,
+    MarkdownOpts (..),
     TimeZones (..),
     noteToMarkdown,
     noteToMarkdownSystemTZ,
@@ -13,6 +14,10 @@ import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag
 
 type Markdown = T.Text
 
+data MarkdownOpts
+  = YamlFrontMatter
+  | NoFrontMatter
+
 -- Wrapper for our the *two* time zones we need in order to properly localize
 -- these two timestamps. Annoying! See the docs for `noteToMarkdownSystemTZ`
 -- below for some more context.
@@ -23,23 +28,26 @@ data TimeZones = TimeZones
 
 -- Convert a note to markdown. The time zones are used to display the timestamp
 -- metadata in the user's time zone, rather than the default of UTC.
-noteToMarkdown :: Note -> TimeZones -> Markdown
-noteToMarkdown n tz =
-  metadataToMarkdown (metadata n) tz
-    <> "\n\n"
+noteToMarkdown :: MarkdownOpts -> Note -> TimeZones -> Markdown
+noteToMarkdown mdOpts n tz =
+  frontMatter
     <> titleToMarkdown (title n)
     <> contentToMarkdown (content n)
+  where
+    frontMatter = case mdOpts of
+      YamlFrontMatter -> metadataToMarkdown (metadata n) tz <> "\n\n"
+      NoFrontMatter -> ""
 
 -- Addresses a subtle bug with daylight savings, aka "summer time". We can't
 -- just get the system time zone, we have to get a *different* system time zone
 -- for each distinct DateTime. In other words, what would our *current* time
 -- zone have been at *that* point in time?
-noteToMarkdownSystemTZ :: Note -> IO Markdown
-noteToMarkdownSystemTZ n = do
+noteToMarkdownSystemTZ :: MarkdownOpts -> Note -> IO Markdown
+noteToMarkdownSystemTZ mdOpts n = do
   createdTz <- getTimeZone $ created n
   editedTz <- getTimeZone $ edited n
   let tz = TimeZones {createdTz = createdTz, editedTz = editedTz}
-  return $ noteToMarkdown n tz
+  return $ noteToMarkdown mdOpts n tz
   where
     created = createdTime . metadata
     edited = lastEditedTime . metadata

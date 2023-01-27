@@ -7,7 +7,7 @@ where
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Data.Time (UTCTime)
-import Markdown (noteToMarkdownSystemTZ)
+import Markdown (MarkdownOpts (..), noteToMarkdownSystemTZ)
 import Note (Metadata (..), Note (..))
 import Parse (KeepJSON, ParseError, parseNote)
 import Path (PathOptions (..), getNotePath)
@@ -87,7 +87,7 @@ convertKeepNote pathOpts json = mapM (noteToFile pathOpts) (parseNote json)
 
 noteToFile :: PathOptions -> Note -> IO File
 noteToFile pathOpts n = do
-  markdown <- noteToMarkdownSystemTZ n
+  markdown <- noteToMarkdownSystemTZ NoFrontMatter n
   return
     File
       { path = getNotePath n pathOpts,
