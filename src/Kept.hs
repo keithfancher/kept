@@ -1,5 +1,7 @@
 module Kept
-  ( exportNoteToFile,
+  ( KeptOptions (..),
+    exportNotes,
+    exportNoteToFile,
     exportNoteToStdOut,
   )
 where
@@ -14,17 +16,33 @@ import Path (PathOptions (..), getNotePath)
 import System.Directory (createDirectoryIfMissing, doesFileExist, setModificationTime)
 import System.FilePath (dropExtension, takeDirectory, takeExtension, (</>))
 
+-- Prepended to all output file paths, keep everything together.
+keptOutputDir :: FilePath
+keptOutputDir = "kept-output"
+
+data KeptOptions = KeptOptions
+  { stdOut :: Bool,
+    pathOptions :: PathOptions
+  }
+
 -- Simple container for text that lives at some filepath.
 data File = File
   { path :: FilePath,
     content :: T.Text,
     lastModified :: UTCTime
   }
-  deriving (Show, Eq)
 
--- Prepended to all output file paths, keep everything together.
-keptOutputDir :: FilePath
-keptOutputDir = "kept-output"
+exportNotes :: KeptOptions -> [FilePath] -> IO ()
+exportNotes (KeptOptions stdOut pathOpts) inFiles = do
+  if stdOut
+    then mapM_ (printNoteWithPadding pathOpts) inFiles
+    else mapM_ (exportNoteToFile pathOpts) inFiles
+  putStrLn "Export complete!"
+  where
+    printNoteWithPadding opts f = do
+      putStrLn "-----------------------------------------------------------\n"
+      exportNoteToStdOut opts f
+      putStrLn ""
 
 -- Reads the exported Google Keep json from the given file path, converts it to
 -- markdown, and writes a new file.
@@ -87,7 +105,7 @@ convertKeepNote pathOpts json = mapM (noteToFile pathOpts) (parseNote json)
 
 noteToFile :: PathOptions -> Note -> IO File
 noteToFile pathOpts n = do
-  markdown <- noteToMarkdownSystemTZ NoFrontMatter n
+  markdown <- noteToMarkdownSystemTZ YamlFrontMatter n
   return
     File
       { path = getNotePath n pathOpts,

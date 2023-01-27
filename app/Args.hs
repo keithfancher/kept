@@ -1,33 +1,38 @@
 module Args
-  ( KeptOptions (..),
+  ( CLIOpts (..),
     cliOptParser,
   )
 where
 
+import Kept (KeptOptions (..))
 import Options.Applicative
 import Path (PathOptions (..))
 
-data KeptOptions = KeptOptions
-  { stdOut :: Bool,
-    pathOptions :: PathOptions,
+data CLIOpts = CLIOpts
+  { keptOptions :: KeptOptions,
     inFiles :: [FilePath]
   }
 
-cliOptParser :: ParserInfo KeptOptions
+cliOptParser :: ParserInfo CLIOpts
 cliOptParser =
   info
-    (keptOptionParser <**> helper)
+    (optWrapperParser <**> helper)
     ( fullDesc
         <> header "kept: Extract your data from Google Keep."
         <> progDesc "Pass in one or more of your exported Google Keep JSON files and get some nice markdown in return. Export your Keep JSON data via takeout.google.com."
     )
+
+optWrapperParser :: Parser CLIOpts
+optWrapperParser =
+  CLIOpts
+    <$> keptOptionParser
+    <*> filePathsParser
 
 keptOptionParser :: Parser KeptOptions
 keptOptionParser =
   KeptOptions
     <$> stdOutFlagParser
     <*> tagPathFlagParser
-    <*> filePathsParser
 
 stdOutFlagParser :: Parser Bool
 stdOutFlagParser =
@@ -51,8 +56,6 @@ tagPathFlagParser =
     toPathOpt False = TagSubDirs
     toPathOpt True = NoTagSubDirs
 
--- We get these in from the CLI as a list of paths, but need to transform it
--- into `InFiles`, the actually-useful type.
 filePathsParser :: Parser [FilePath]
 filePathsParser =
   some -- `some` == "one or more" (as opposed to `many`, zero or more)
