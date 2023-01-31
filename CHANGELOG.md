@@ -8,4 +8,9 @@ and this project adheres to the
 
 ## Unreleased
 
-## 0.1.0.0 - YYYY-MM-DD
+## 0.1.0 - 2023-01-30
+
+### Added
+
+- Everything! Almost. Convert Keep JSON to markdown, but no media attachments
+  yet.
