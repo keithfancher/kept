@@ -32,12 +32,16 @@ editor](https://neovim.io/)).
 `kept` uses JSON data exported from [Google
 Takeout](https://takeout.google.com/). The first step is to export your data.
 
-The quickest approach is log in to Google Takeout, "de-select all", then
-select *only* Keep for your export. If you export everything, chances are it
-will take a very long time and produce a huge amount of data.
+The quickest approach is to log into Google Takeout, "de-select all", then
+select *only* Keep for your export. (If you export everything, chances are it
+will take a very long time and produce a huge amount of data.)
 
 Once you've got a directory full of exported Google Keep JSON, you can convert
-*any* or *all* of these files using `kept`. Here are some simple examples:
+*any* or *all* of these files using `kept`. [Grab the latest
+release](https://github.com/keithfancher/kept/releases) for your platform of
+choice, and take it for a test-drive.
+
+Here are some simple examples:
 
 ```
 # This will convert a single note. By default, the markdown output will be
@@ -58,7 +62,19 @@ $ kept -s "~/Takeout/Keep/Great Ideas.json"
 ```
 
 
-## Building from source
+## Installation
+
+You've got two options:
+
+1. Build from source. Not recommended unless you need a particular
+   cutting-edge feature that isn't included in the latest binary release. (But
+   don't worry: building isn't *complicated*. It's just *slow*.)
+2. Install a binary [release](https://github.com/keithfancher/kept/releases).
+   The quick-and-easy route.
+
+More details below.
+
+### Building from source
 
 We use Stack as our build system. You can [install it
 directly](https://docs.haskellstack.org/en/stable/#how-to-install-stack) or
@@ -89,8 +105,7 @@ $ stack exec kept -- -s ~/Takeout/Keep/test.json
 
 To uninstall, simply remove the `kept` binary from wherever you installed it.
 
-
-## Binary installation
+### Binary installation
 
 Download the latest build for your platform of choice from the Github
 [releases page](https://github.com/keithfancher/kept/releases). Extract the
