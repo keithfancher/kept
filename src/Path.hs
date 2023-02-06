@@ -63,9 +63,9 @@ titleLength = 45
 -- (In that order. For example, if a note is trashed, we don't care about its
 -- tags, or that it's pinned.)
 noteSubDir :: Metadata -> PathOptions -> FilePath
-noteSubDir (Metadata _ _ _ True _ _) _ = "trash"
-noteSubDir (Metadata _ _ _ _ _ True) _ = "archive"
-noteSubDir (Metadata _ _ _ _ True _) _ = "pinned"
+noteSubDir (Metadata _ _ _ _ True _ _) _ = "trash"
+noteSubDir (Metadata _ _ _ _ _ _ True) _ = "archive"
+noteSubDir (Metadata _ _ _ _ _ True _) _ = "pinned"
 -- If not trashed/archive/pinned, check the tag-based path options:
 noteSubDir _ NoTagSubDirs = "all-notes"
 noteSubDir m TagSubDirs = subDirFromTags $ tags m

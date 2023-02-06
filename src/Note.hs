@@ -1,5 +1,6 @@
 module Note
-  ( ChecklistItem (..),
+  ( Attachment,
+    ChecklistItem (..),
     Metadata (..),
     Note (..),
     NoteContent (..),
@@ -25,11 +26,16 @@ data Metadata = Metadata
   { createdTime :: UTCTime,
     lastEditedTime :: UTCTime,
     tags :: [Tag],
+    attachments :: [Attachment],
     isTrashed :: Bool,
     isPinned :: Bool,
     isArchived :: Bool
   }
   deriving (Show, Eq)
+
+-- A note can have zero or more media attachments. (Images and audio,
+-- primarily.)
+type Attachment = FilePath
 
 data NoteContent = Text T.Text | Checklist [ChecklistItem]
   deriving (Show, Eq)
