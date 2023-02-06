@@ -13,7 +13,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Time (UTCTime)
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import GHC.Generics (Generic)
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, mkTag)
+import Note (Attachment, ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, mkTag)
 
 type ParseError = String
 
@@ -30,7 +30,7 @@ parseKeepJson :: KeepJSON -> Either ParseError KeepNote
 parseKeepJson = eitherDecode . B.fromStrict . encodeUtf8
 
 mapNote :: KeepNote -> Either ParseError Note
-mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _) = do
+mapNote note@(KeepNote trash pinned archive noteTitle edited created labels attachments _ _) = do
   noteContent <- mapNoteContent note
   return
     Note
@@ -41,7 +41,8 @@ mapNote note@(KeepNote trash pinned archive noteTitle edited created labels _ _)
               createdTime = microTimestampToUTC created,
               isArchived = archive,
               isPinned = pinned,
-              isTrashed = trash
+              isTrashed = trash,
+              attachments = mapAttachments attachments
             },
         title = case noteTitle of
           "" -> Nothing
@@ -65,6 +66,12 @@ mapLabels (Just labels) = map tagify labels
   where
     tagify = mkTag . name
 
+mapAttachments :: Maybe [KeepAttachment] -> [Attachment]
+mapAttachments Nothing = []
+mapAttachments (Just a) = map fromKeep a
+  where
+    fromKeep = T.unpack . filePath
+
 -- Input data has a microsecond timestamp, convert to `UTCTime`.
 microTimestampToUTC :: Int -> UTCTime
 microTimestampToUTC microTs = posixSecondsToUTCTime $ fromIntegral tsSeconds
@@ -80,6 +87,7 @@ data KeepNote = KeepNote
     userEditedTimestampUsec :: Int,
     createdTimestampUsec :: Int,
     labels :: Maybe [KeepLabel],
+    attachments :: Maybe [KeepAttachment],
     textContent :: Maybe T.Text,
     listContent :: Maybe [KeepListItem]
   }
@@ -102,3 +110,11 @@ data KeepLabel = KeepLabel
   deriving (Generic, Show)
 
 instance FromJSON KeepLabel
+
+-- The JSON also contains a `mimetype` field that we don't care about.
+data KeepAttachment = KeepAttachment
+  { filePath :: T.Text
+  }
+  deriving (Generic, Show)
+
+instance FromJSON KeepAttachment

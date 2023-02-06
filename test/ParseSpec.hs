@@ -18,6 +18,9 @@ spec = do
     it "parses a checklist" $ do
       parseNote checklistJson `shouldBe` Right checklistOutput
 
+    it "parses a note with attachments" $ do
+      parseNote attachmentJson `shouldBe` Right attachmentOutput
+
 basicNoteJson :: T.Text
 basicNoteJson = "{\"color\":\"DEFAULT\",\"isTrashed\":false,\"isPinned\":false,\"isArchived\":false,\"textContent\":\"I'm a note! :D\",\"title\":\"\",\"userEditedTimestampUsec\":1632886343121000,\"createdTimestampUsec\":1632886283906000,\"labels\":[{\"name\":\"Language\"}]}"
 
@@ -29,6 +32,7 @@ basicNoteOutput =
           { tags = mkTags ["Language"],
             lastEditedTime = microTimestampToUTC 1632886343121000,
             createdTime = microTimestampToUTC 1632886283906000,
+            attachments = [],
             isTrashed = False,
             isPinned = False,
             isArchived = False
@@ -48,6 +52,7 @@ checklistOutput =
           { tags = mkTags ["Goals", "Travel"],
             lastEditedTime = microTimestampToUTC 1638147241847000,
             createdTime = microTimestampToUTC 1638145929577000,
+            attachments = [],
             isTrashed = False,
             isPinned = True,
             isArchived = False
@@ -61,4 +66,24 @@ checklistOutput =
             ChecklistItem "Spain" False,
             ChecklistItem "Iceland" False
           ]
+    }
+
+attachmentJson :: T.Text
+attachmentJson = "{\"attachments\":[{\"filePath\":\"1748a3164a3.8ab3a6025474d7d8.jpg\",\"mimetype\":\"image/jpeg\"}],\"color\":\"DEFAULT\",\"isTrashed\":false,\"isPinned\":false,\"isArchived\":false,\"textContent\":\"Rockin' image attached\",\"title\":\"\",\"userEditedTimestampUsec\":1632886343121000,\"createdTimestampUsec\":1632886283906000,\"labels\":[{\"name\":\"cat stuff\"}]}"
+
+attachmentOutput :: Note
+attachmentOutput =
+  Note
+    { metadata =
+        Metadata
+          { tags = mkTags ["cat-stuff"],
+            lastEditedTime = microTimestampToUTC 1632886343121000,
+            createdTime = microTimestampToUTC 1632886283906000,
+            attachments = ["1748a3164a3.8ab3a6025474d7d8.jpg"],
+            isTrashed = False,
+            isPinned = False,
+            isArchived = False
+          },
+      title = Nothing,
+      content = Text "Rockin' image attached"
     }
