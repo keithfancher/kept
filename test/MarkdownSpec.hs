@@ -95,4 +95,4 @@ noteWithAttachments =
     }
 
 noteWithAttachmentsMarkdown :: Markdown
-noteWithAttachmentsMarkdown = "---\ntags: [Health]\ncreatedTime: 2021-09-28T19:31:23-08:00\nlastEditedTime: 2021-09-28T19:32:23-08:00\nattachments: [big-toe.png, little-toe.png, wart-close-up.png]\n---\n\n# Toe data\n\nSee attached images for latest toe info."
+noteWithAttachmentsMarkdown = "---\ntags: [Health]\ncreatedTime: 2021-09-28T19:31:23-08:00\nlastEditedTime: 2021-09-28T19:32:23-08:00\nattachments: [big-toe.png, little-toe.png, wart-close-up.png]\n---\n\n# Toe data\n\n![](big-toe.png)\n![](little-toe.png)\n![](wart-close-up.png)\n\nSee attached images for latest toe info."

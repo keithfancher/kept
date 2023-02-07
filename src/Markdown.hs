@@ -33,8 +33,10 @@ noteToMarkdown :: MarkdownOpts -> Note -> TimeZones -> Markdown
 noteToMarkdown mdOpts n tz =
   frontMatter
     <> titleToMarkdown (title n)
+    <> attachmentsToMarkdown (attachList n)
     <> contentToMarkdown (content n)
   where
+    attachList = attachments . metadata
     frontMatter = case mdOpts of
       YamlFrontMatter -> metadataToMarkdown (metadata n) tz <> "\n\n"
       NoFrontMatter -> ""
@@ -65,7 +67,7 @@ metadataToMarkdown m (TimeZones createdTz editedTz) =
     <> "lastEditedTime: "
     <> timeToMarkdown (lastEditedTime m) editedTz
     <> "\n"
-    <> attachmentsToMarkdown (attachments m)
+    <> attachmentPathsToMarkdown (attachments m)
     <> "---"
 
 tagsToMarkdown :: [Tag] -> Markdown
@@ -94,8 +96,15 @@ timeToMarkdown utcTime tz = T.pack $ iso8601Show zoned
 -- We're including the key name (`attachments`) in the output here. UNLIKE with
 -- tags, if there are no attachments we don't want to include the field the
 -- markdown output at all.
-attachmentsToMarkdown :: [Attachment] -> Markdown
-attachmentsToMarkdown [] = ""
-attachmentsToMarkdown attachments = "attachments: [" <> commaSep attachments <> "]\n"
+attachmentPathsToMarkdown :: [Attachment] -> Markdown
+attachmentPathsToMarkdown [] = ""
+attachmentPathsToMarkdown attachments = "attachments: [" <> commaSep attachments <> "]\n"
   where
     commaSep a = T.pack $ intercalate ", " a
+
+-- Similar to above: if we have no attachments, nothing should be rendered.
+attachmentsToMarkdown :: [Attachment] -> Markdown
+attachmentsToMarkdown [] = ""
+attachmentsToMarkdown as = T.intercalate "\n" (map attachmentToMd as) <> "\n\n"
+  where
+    attachmentToMd a = "![](" <> T.pack a <> ")"
