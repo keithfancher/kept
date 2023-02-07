@@ -7,10 +7,11 @@ module Markdown
   )
 where
 
+import Data.List (intercalate)
 import Data.Text qualified as T
 import Data.Time (TimeZone, UTCTime, getTimeZone, utcToZonedTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
-import Note (ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, unTag)
+import Note (Attachment, ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, unTag)
 
 type Markdown = T.Text
 
@@ -64,6 +65,7 @@ metadataToMarkdown m (TimeZones createdTz editedTz) =
     <> "lastEditedTime: "
     <> timeToMarkdown (lastEditedTime m) editedTz
     <> "\n"
+    <> attachmentsToMarkdown (attachments m)
     <> "---"
 
 tagsToMarkdown :: [Tag] -> Markdown
@@ -88,3 +90,12 @@ timeToMarkdown :: UTCTime -> TimeZone -> Markdown
 timeToMarkdown utcTime tz = T.pack $ iso8601Show zoned
   where
     zoned = utcToZonedTime tz utcTime
+
+-- We're including the key name (`attachments`) in the output here. UNLIKE with
+-- tags, if there are no attachments we don't want to include the field the
+-- markdown output at all.
+attachmentsToMarkdown :: [Attachment] -> Markdown
+attachmentsToMarkdown [] = ""
+attachmentsToMarkdown attachments = "attachments: [" <> commaSep attachments <> "]\n"
+  where
+    commaSep a = T.pack $ intercalate ", " a

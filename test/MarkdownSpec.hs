@@ -17,10 +17,13 @@ spec = do
       let opts = YamlFrontMatter
       noteToMarkdown opts checklist pst `shouldBe` checklistMarkdown
 
+    it "converts a note with attachments" $ do
+      let opts = YamlFrontMatter
+      noteToMarkdown opts noteWithAttachments pst `shouldBe` noteWithAttachmentsMarkdown
+
     it "converts a text note with no YAML front-matter" $ do
       let opts = NoFrontMatter
       noteToMarkdown opts basicNote pst `shouldBe` "I'm a note! :D"
-
 
 pst :: TimeZones
 pst = TimeZones {createdTz = pstWinter, editedTz = pstWinter}
@@ -35,6 +38,7 @@ basicNote =
           { tags = mkTags ["Language"],
             lastEditedTime = microTimestampToUTC 1632886343121000,
             createdTime = microTimestampToUTC 1632886283906000,
+            attachments = [],
             isTrashed = False,
             isPinned = False,
             isArchived = False
@@ -54,6 +58,7 @@ checklist =
           { tags = mkTags ["Goals", "Travel"],
             lastEditedTime = microTimestampToUTC 1638147241847000,
             createdTime = microTimestampToUTC 1638145929577000,
+            attachments = [],
             isTrashed = False,
             isPinned = True,
             isArchived = False
@@ -71,3 +76,23 @@ checklist =
 
 checklistMarkdown :: Markdown
 checklistMarkdown = "---\ntags: [Goals, Travel]\ncreatedTime: 2021-11-28T16:32:09-08:00\nlastEditedTime: 2021-11-28T16:54:01-08:00\n---\n\n# Trips\n\n- [x] France\n- [x] Japan\n- [x] Italy\n- [ ] Spain\n- [ ] Iceland"
+
+noteWithAttachments :: Note
+noteWithAttachments =
+  Note
+    { metadata =
+        Metadata
+          { tags = mkTags ["Health"],
+            lastEditedTime = microTimestampToUTC 1632886343121000,
+            createdTime = microTimestampToUTC 1632886283906000,
+            attachments = ["big-toe.png", "little-toe.png", "wart-close-up.png"],
+            isTrashed = False,
+            isPinned = False,
+            isArchived = False
+          },
+      title = Just "Toe data",
+      content = Text "See attached images for latest toe info."
+    }
+
+noteWithAttachmentsMarkdown :: Markdown
+noteWithAttachmentsMarkdown = "---\ntags: [Health]\ncreatedTime: 2021-09-28T19:31:23-08:00\nlastEditedTime: 2021-09-28T19:32:23-08:00\nattachments: [big-toe.png, little-toe.png, wart-close-up.png]\n---\n\n# Toe data\n\nSee attached images for latest toe info."
