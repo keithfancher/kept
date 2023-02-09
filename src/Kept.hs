@@ -11,7 +11,7 @@ import Data.Text.IO qualified as TIO
 import Data.Time (UTCTime)
 import Markdown (MarkdownOpts (..), noteToMarkdownSystemTZ)
 import Note (Metadata (..), Note (..))
-import Parse (KeepJSON, ParseError, parseNote)
+import Parse (parseNote)
 import Path (PathOptions (..), getNotePath)
 import System.Directory (createDirectoryIfMissing, doesFileExist, setModificationTime)
 import System.FilePath (dropExtension, takeDirectory, takeExtension, (</>))
@@ -54,8 +54,16 @@ exportNoteToFile opts jsonPath = exportNote opts jsonPath writeNoteFile
 exportNoteToStdOut :: KeptOptions -> FilePath -> IO ()
 exportNoteToStdOut opts jsonPath = exportNote opts jsonPath printNoteFile
 
-writeNoteFile :: File -> IO ()
-writeNoteFile (File fullNotePath content modified) = do
+exportNote :: KeptOptions -> FilePath -> (KeptOptions -> Note -> IO ()) -> IO ()
+exportNote opts jsonPath export = do
+  json <- TIO.readFile jsonPath
+  case parseNote json of
+    Left e -> putStrLn $ "Error: " <> e
+    Right n -> export opts n
+
+writeNoteFile :: KeptOptions -> Note -> IO ()
+writeNoteFile opts note = do
+  (File fullNotePath content modified) <- noteToFile opts note
   -- First create the directory for our note:
   let noteDirectory = keptOutputDir </> takeDirectory fullNotePath
   let createParentDirs = True
@@ -88,21 +96,11 @@ addNumberToFileName f n = sansExtension <> " (" <> show n <> ")" <> extension
     sansExtension = dropExtension f
     extension = takeExtension f
 
-printNoteFile :: File -> IO ()
-printNoteFile (File path content _) = do
+printNoteFile :: KeptOptions -> Note -> IO ()
+printNoteFile opts note = do
+  (File path content _) <- noteToFile opts note
   putStrLn $ "NOTE PATH:\n" <> path <> "\n\n" <> "NOTE CONTENT:"
   TIO.putStrLn content
-
-exportNote :: KeptOptions -> FilePath -> (File -> IO ()) -> IO ()
-exportNote opts jsonPath export = do
-  json <- TIO.readFile jsonPath
-  noteFile <- convertKeepNote opts json
-  case noteFile of
-    Left e -> putStrLn $ "Error: " <> e
-    Right f -> export f
-
-convertKeepNote :: KeptOptions -> KeepJSON -> IO (Either ParseError File)
-convertKeepNote opts json = mapM (noteToFile opts) (parseNote json)
 
 noteToFile :: KeptOptions -> Note -> IO File
 noteToFile (KeptOptions _ pathOpts mdOpts) n = do
