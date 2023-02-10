@@ -23,8 +23,7 @@ editor](https://neovim.io/)).
   status, and "pinned" status
 - Untitled notes are given filenames generated from note content, rather than
   Google's "timestamp-as-title" approach
-
-**STILL TODO:** Handle notes with media attachments (audio/images).
+- Full support for media attachments (audio/images)
 
 
 ## Quick-start
@@ -171,6 +170,27 @@ Note that this is *totally independent* from the metadata stored in a note's
 YAML front-matter. In other words, you can disable the YAML front-matter and
 still be confident that your notes will be date-and-time sortable, searchable,
 and so on.
+
+
+## Media attachments
+
+If a Keep note has media attachments (audio or images), `kept` will do a few
+things:
+
+1. Copy those files to a `media` subdirectory within `kept-output`. (Media
+   file metadata will be preserved wherever possible.)
+2. Include a list of those media attachments in the YAML front-matter of the
+   note.
+3. Embed the media directly in the note body, using standard
+   (Obsidian-friendly) markdown syntax.
+
+This yields a final output that looks quite similar to the way media
+attachments are presented in the original Google Keep note.
+
+Note that `kept` will *not* rename your media files as it copies them over, so
+whatever funky names Google Takeout has given them will remain. If you'd like
+to rename them, I suggest using Obsidian to do so, since it keeps track of
+file backlinks and can update linked files accordingly.
 
 
 ## Options / Flags
