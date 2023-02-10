@@ -5,6 +5,7 @@ module Note
     Note (..),
     NoteContent (..),
     Tag,
+    getAttachments,
     mkTag,
     mkTags,
     unTag,
@@ -36,6 +37,10 @@ data Metadata = Metadata
 -- A note can have zero or more media attachments. (Images and audio,
 -- primarily.)
 type Attachment = FilePath
+
+-- Mild convenience!
+getAttachments :: Note -> [Attachment]
+getAttachments = attachments . metadata
 
 data NoteContent = Text T.Text | Checklist [ChecklistItem]
   deriving (Show, Eq)

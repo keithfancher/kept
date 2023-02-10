@@ -11,7 +11,7 @@ import Data.List (intercalate)
 import Data.Text qualified as T
 import Data.Time (TimeZone, UTCTime, getTimeZone, utcToZonedTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
-import Note (Attachment, ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, unTag)
+import Note (Attachment, ChecklistItem (..), Metadata (..), Note (..), NoteContent (..), Tag, getAttachments, unTag)
 
 type Markdown = T.Text
 
@@ -33,10 +33,9 @@ noteToMarkdown :: MarkdownOpts -> Note -> TimeZones -> Markdown
 noteToMarkdown mdOpts n tz =
   frontMatter
     <> titleToMarkdown (title n)
-    <> attachmentsToMarkdown (attachList n)
+    <> attachmentsToMarkdown (getAttachments n)
     <> contentToMarkdown (content n)
   where
-    attachList = attachments . metadata
     frontMatter = case mdOpts of
       YamlFrontMatter -> metadataToMarkdown (metadata n) tz <> "\n\n"
       NoFrontMatter -> ""

@@ -10,7 +10,7 @@ import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Data.Time (UTCTime)
 import Markdown (MarkdownOpts (..), noteToMarkdownSystemTZ)
-import Note (Attachment, Metadata (..), Note (..))
+import Note (Attachment, Metadata (..), Note (..), getAttachments)
 import Parse (parseNote)
 import Path (PathOptions (..), getNotePath)
 import System.Directory (copyFileWithMetadata, createDirectoryIfMissing, doesFileExist, setModificationTime)
@@ -104,7 +104,6 @@ copyAttachmentFiles prevAttachmentPath note = mapM_ copyAttachment $ getAttachme
         (prevAttachmentPath </> takeFileName a) -- copy FROM
         (outputDir </> takeFileName a) -- copy TO
     outputDir = keptOutputDir </> attachmentDir
-    getAttachments = attachments . metadata -- TODO: repet, refactor
 
 -- Updates all of a Note's attachment paths, prepends our output directories.
 updateNoteAttachments :: Note -> Note
@@ -112,7 +111,6 @@ updateNoteAttachments note = note {metadata = newMetadata}
   where
     newMetadata = (metadata note) {attachments = newAttachments}
     newAttachments = newAttachmentPath $ getAttachments note
-    getAttachments = attachments . metadata
 
 -- Prepend the `media` directory to our attachment paths. Note this is the
 -- final RELATIVE path that will be written to the markdown note.
