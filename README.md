@@ -1,6 +1,6 @@
 # kept
 
-A work-in-progress tool to convert exported [Google
+A handy tool to convert exported [Google
 Keep](https://keep.google.com/) data into plain markdown notes (for use with
 [Obsidian](https://obsidian.md/),
 [Markor](https://github.com/gsantner/markor), or [any other text
@@ -16,7 +16,7 @@ editor](https://neovim.io/)).
 - Preserves note metadata: `createdTime` and `lastEditedTime` are included in
   each note's [YAML front
   matter](https://help.obsidian.md/Advanced+topics/YAML+front+matter), and so
-  are its tags
+  are its tags and a list of its attachments
 - Filesystem metadata is also updated, i.e. the `lastEditedTime` for each note
   will be reflected in the created file's "last modified time"
 - Exported notes are sorted into subdirectories based on label, archive/trash
@@ -47,14 +47,18 @@ Here are some simple examples:
 # written to a file in the `kept-output` directory, relative to your current
 # working directory. More details below re: the full path of this file and
 # its name.
-$ kept ~/Takeout/Keep/Todo.json
+$ kept ~/Takeout/Keep/Important.json
 
 # Alternatively, you can convert everything at once! (Be sure to actually glob
 # for `*.json`, as there will also likely be HTML and some other random files
 # in your Google Takeout export.)
 $ kept ~/Takeout/Keep/*.json
 
-# Use the `-s` (or `--stdout`) option to print the converted markdown content
+# The `t` option (aka `--title-in-yaml`) may come in handy for Obsidian
+# users. See the "Options / Flags" section below for more info!
+$ kept -t ~/Takeout/Keep/*.json
+
+# Use the `-s` (aka `--stdout`) option to print the converted markdown content
 # to stdout rather than writing to a file. Useful to preview how a note would
 # look, if you're curious:
 $ kept -s "~/Takeout/Keep/Great Ideas.json"
@@ -144,14 +148,20 @@ option. See "Options" below for more detail.
 ## Note contents / Front-matter
 
 Google Keep notes don't contain formatting, so each note's contents will be
-exported more-or-less as-is. If a note has a title, that title will be written
-as a top-level markdown heading. (The title is also used as a filename for the
-note.) Checklists are converted into standard markdown checklists.
+exported more-or-less as-is.
+
+If a note has a title, that title will be written as a top-level markdown
+heading. (Unless you use the `--title-in-yaml` CLI option. See "Options /
+Flags" below.) The title is also used as the filename for the note.
+
+Checklists are converted into standard markdown checklists.
 
 By default, each note's metadata will be included as YAML front-matter at the
 top of the file. (Many common editors support this, including Obsidian and
-Markor.) The included front-matter fields are: `tags`, `createdTime`, and
-`lastEditedTime`.
+Markor.) The default included front-matter fields are: `tags`, `createdTime`,
+and `lastEditedTime`. If a note has attachments, there will also be an
+`attachments` field. If you've specified the `--title-in-yaml` option, there
+will be a `title` field as well.
 
 You can disable the YAML front-matter entirely with the `--no-yaml` CLI
 option. (See the "Options" section below.) Note that if you do, it might make
@@ -197,10 +207,15 @@ file backlinks and can update linked files accordingly.
 
 - `--stdout` / `-s`: Print output to screen rather than writing files. Useful
   to preview the results of an export.
-- `--no-tag-subdirs` / `-t`: Do not sort notes into tag-based subdirectories.
+- `--no-tag-subdirs` / `-n`: Do not sort notes into tag-based subdirectories.
   Notes will still be sorted into `trash`, `archive`, and `pinned`, but all
   *remaining* notes will go into a single `all-notes` subdirectory.
 - `--no-yaml` / `-y`: Do *not* add YAML front-matter to exported notes. By
   default, each note will have `tags`, `createdTime`, and `lastEditedTime`
   properties included in its YAML front-matter. This option leaves out the
-  front-matter entirely.
+  front-matter entirely. (Note that this takes precedence over the
+  `--title-in-yaml` option below.)
+- `--title-in-yaml` / `-t`: Include a note's title as a field in the YAML
+  front-matter *instead of* as a heading in the body of the note. This might
+  be handy for some Obsidian users, since Obsidian uses the filename as the
+  title of a note, which makes the heading look a little redundant.
