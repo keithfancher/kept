@@ -68,7 +68,7 @@ frontMatterFlagParser =
       )
   where
     -- Same as the path flag -- a big confusing, but you get the idea.
-    toYamlOpt False = YamlFrontMatter
+    toYamlOpt False = FrontMatterDefault
     toYamlOpt True = NoFrontMatter
 
 filePathsParser :: Parser [FilePath]

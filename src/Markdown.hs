@@ -16,8 +16,9 @@ import Note (Attachment, ChecklistItem (..), Metadata (..), Note (..), NoteConte
 type Markdown = T.Text
 
 data MarkdownOpts
-  = YamlFrontMatter
-  | NoFrontMatter
+  = FrontMatterDefault -- default fields included in YAML front-matter
+  | FrontMatterWithTitle -- includes all default fields PLUS the note title, removes title heading in note body
+  | NoFrontMatter -- no YAML front-matter at all
 
 -- Wrapper for our the *two* time zones we need in order to properly localize
 -- these two timestamps. Annoying! See the docs for `noteToMarkdownSystemTZ`
@@ -32,13 +33,13 @@ data TimeZones = TimeZones
 noteToMarkdown :: MarkdownOpts -> Note -> TimeZones -> Markdown
 noteToMarkdown mdOpts n tz =
   frontMatter
-    <> titleToMarkdown (title n)
+    <> titleToMarkdown mdOpts (title n)
     <> attachmentsToMarkdown (getAttachments n)
     <> contentToMarkdown (content n)
   where
     frontMatter = case mdOpts of
-      YamlFrontMatter -> metadataToMarkdown (metadata n) tz <> "\n\n"
       NoFrontMatter -> ""
+      _ -> yamlFrontMatter mdOpts n tz <> "\n\n"
 
 -- Addresses a subtle bug with daylight savings, aka "summer time". We can't
 -- just get the system time zone, we have to get a *different* system time zone
@@ -54,11 +55,12 @@ noteToMarkdownSystemTZ mdOpts n = do
     created = createdTime . metadata
     edited = lastEditedTime . metadata
 
-metadataToMarkdown :: Metadata -> TimeZones -> Markdown
-metadataToMarkdown m (TimeZones createdTz editedTz) =
+yamlFrontMatter :: MarkdownOpts -> Note -> TimeZones -> Markdown
+yamlFrontMatter opts (Note m t _) (TimeZones createdTz editedTz) =
   "---\n"
+    <> titleYaml opts t
     <> "tags: "
-    <> tagsToMarkdown (tags m)
+    <> tagsYaml (tags m)
     <> "\n"
     <> "createdTime: "
     <> timeToMarkdown (createdTime m) createdTz
@@ -66,18 +68,26 @@ metadataToMarkdown m (TimeZones createdTz editedTz) =
     <> "lastEditedTime: "
     <> timeToMarkdown (lastEditedTime m) editedTz
     <> "\n"
-    <> attachmentPathsToMarkdown (attachments m)
+    <> attachmentPathsYaml (attachments m)
     <> "---"
+  where
+    -- the ONLY case where we output a title in the front-matter:
+    titleYaml FrontMatterWithTitle (Just title) = "title: " <> title <> "\n"
+    titleYaml _ _ = ""
 
-tagsToMarkdown :: [Tag] -> Markdown
-tagsToMarkdown t = "[" <> commaSeparated <> "]"
+tagsYaml :: [Tag] -> Markdown
+tagsYaml t = "[" <> commaSeparated <> "]"
   where
     commaSeparated = T.intercalate ", " $ tagsAsText t
     tagsAsText = map unTag
 
-titleToMarkdown :: Maybe T.Text -> Markdown
-titleToMarkdown Nothing = ""
-titleToMarkdown (Just t) = "# " <> t <> "\n\n"
+-- Outputs the title as level-one heading in the body of the note. If the title
+-- is empty OR if the user has elected to put the title in the YAML
+-- front-matter, we output nothing here.
+titleToMarkdown :: MarkdownOpts -> Maybe T.Text -> Markdown
+titleToMarkdown FrontMatterWithTitle _ = ""
+titleToMarkdown _ Nothing = ""
+titleToMarkdown _ (Just t) = "# " <> t <> "\n\n"
 
 contentToMarkdown :: NoteContent -> Markdown
 contentToMarkdown (Text t) = t
@@ -93,11 +103,11 @@ timeToMarkdown utcTime tz = T.pack $ iso8601Show zoned
     zoned = utcToZonedTime tz utcTime
 
 -- We're including the key name (`attachments`) in the output here. UNLIKE with
--- tags, if there are no attachments we don't want to include the field the
+-- tags, if there are no attachments we don't want to include the field in the
 -- markdown output at all.
-attachmentPathsToMarkdown :: [Attachment] -> Markdown
-attachmentPathsToMarkdown [] = ""
-attachmentPathsToMarkdown attachments = "attachments: [" <> commaSep attachments <> "]\n"
+attachmentPathsYaml :: [Attachment] -> Markdown
+attachmentPathsYaml [] = ""
+attachmentPathsYaml attachments = "attachments: [" <> commaSep attachments <> "]\n"
   where
     commaSep a = T.pack $ intercalate ", " a
 

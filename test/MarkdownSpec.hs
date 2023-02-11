@@ -10,20 +10,28 @@ spec :: Spec
 spec = do
   describe "noteToMarkdown" $ do
     it "converts a text note" $ do
-      let opts = YamlFrontMatter
+      let opts = FrontMatterDefault
       noteToMarkdown opts basicNote pst `shouldBe` basicNoteMarkdown
 
     it "converts a checklist" $ do
-      let opts = YamlFrontMatter
+      let opts = FrontMatterDefault
       noteToMarkdown opts checklist pst `shouldBe` checklistMarkdown
 
     it "converts a note with attachments" $ do
-      let opts = YamlFrontMatter
+      let opts = FrontMatterDefault
       noteToMarkdown opts noteWithAttachments pst `shouldBe` noteWithAttachmentsMarkdown
 
     it "converts a text note with no YAML front-matter" $ do
       let opts = NoFrontMatter
       noteToMarkdown opts basicNote pst `shouldBe` "I'm a note! :D"
+
+    it "converts a note with its title in the YAML front-matter" $ do
+      let opts = FrontMatterWithTitle
+      noteToMarkdown opts noteWithAttachments pst `shouldBe` titleInFrontMatterMarkdown
+
+    it "leaves an empty title out of the front-matter regardless of options" $ do
+      let opts = FrontMatterWithTitle -- explicitly saying "we want title in front matter"...
+      noteToMarkdown opts basicNote pst `shouldBe` basicNoteMarkdown -- ... but our note has no title
 
 pst :: TimeZones
 pst = TimeZones {createdTz = pstWinter, editedTz = pstWinter}
@@ -96,3 +104,6 @@ noteWithAttachments =
 
 noteWithAttachmentsMarkdown :: Markdown
 noteWithAttachmentsMarkdown = "---\ntags: [Health]\ncreatedTime: 2021-09-28T19:31:23-08:00\nlastEditedTime: 2021-09-28T19:32:23-08:00\nattachments: [big-toe.png, little-toe.png, wart-close-up.png]\n---\n\n# Toe data\n\n![](big-toe.png)\n![](little-toe.png)\n![](wart-close-up.png)\n\nSee attached images for latest toe info."
+
+titleInFrontMatterMarkdown :: Markdown
+titleInFrontMatterMarkdown = "---\ntitle: Toe data\ntags: [Health]\ncreatedTime: 2021-09-28T19:31:23-08:00\nlastEditedTime: 2021-09-28T19:32:23-08:00\nattachments: [big-toe.png, little-toe.png, wart-close-up.png]\n---\n\n![](big-toe.png)\n![](little-toe.png)\n![](wart-close-up.png)\n\nSee attached images for latest toe info."
