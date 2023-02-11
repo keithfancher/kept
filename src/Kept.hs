@@ -88,7 +88,6 @@ writeNoteFile opts prevAttachmentPath note = do
   -- And finally, set the modification timestamp to match the note metadata:
   setModificationTime uniqueNotePath modified
   -- ACTUALLY finally, copy media attachments to the correct output dir:
-  -- TODO: only create dir if attachments exist?
   _ <- createDirectoryIfMissing createParentDirs (keptOutputDir </> attachmentDir)
   copyAttachmentFiles prevAttachmentPath note
 
