@@ -28,6 +28,8 @@ editor](https://neovim.io/)).
 
 ## Quick-start
 
+*tl;dr: 1) **export** then 2) **convert**.*
+
 `kept` uses JSON data exported from [Google
 Takeout](https://takeout.google.com/). The first step is to export your data.
 
