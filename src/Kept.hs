@@ -9,13 +9,13 @@ where
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Data.Time (UTCTime)
-import File (expandDirectories)
+import File (expandDirectories, getUniqueFileName)
 import Markdown (MarkdownOpts (..), noteToMarkdownSystemTZ)
 import Note (Attachment, Metadata (..), Note (..), getAttachments)
 import Parse (parseNote)
 import Path (PathOptions (..), getNotePath)
-import System.Directory (copyFileWithMetadata, createDirectoryIfMissing, doesFileExist, setModificationTime)
-import System.FilePath (dropExtension, takeDirectory, takeExtension, takeFileName, (</>))
+import System.Directory (copyFileWithMetadata, createDirectoryIfMissing, setModificationTime)
+import System.FilePath (takeDirectory, takeFileName, (</>))
 
 -- Prepended to all output file paths, keep everything together.
 keptOutputDir :: FilePath
@@ -119,26 +119,6 @@ newAttachmentPath :: [Attachment] -> [Attachment]
 newAttachmentPath = map (mediaDirectory </>)
   where
     mediaDirectory = ".." </> attachmentDir
-
--- Checks if the given file name already exists. If it does, add a
--- parenthetical number. Keep incrementing that number until the file doesn't
--- exist. Easiest way to guarantee uniqueness.
-getUniqueFileName :: FilePath -> IO FilePath
-getUniqueFileName f = go f 0
-  where
-    go file attemptNum = do
-      let fn = addNumberToFileName file attemptNum
-      fileAlreadyExists <- doesFileExist fn
-      if fileAlreadyExists
-        then go file (attemptNum + 1)
-        else return fn
-
-addNumberToFileName :: FilePath -> Int -> FilePath
-addNumberToFileName f 0 = f
-addNumberToFileName f n = sansExtension <> " (" <> show n <> ")" <> extension
-  where
-    sansExtension = dropExtension f
-    extension = takeExtension f
 
 printNoteFile :: KeptOptions -> Note -> IO ()
 printNoteFile opts note = do

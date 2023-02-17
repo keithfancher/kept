@@ -1,11 +1,12 @@
 module File
   ( expandDirectories,
+    getUniqueFileName,
   )
 where
 
 import Data.Text qualified as T
-import System.Directory (doesDirectoryExist, listDirectory)
-import System.FilePath (takeExtension, (</>))
+import System.Directory (doesDirectoryExist, doesFileExist, listDirectory)
+import System.FilePath (dropExtension, takeExtension, (</>))
 
 -- If any in a list of FilePaths is a directory, replace that directory with a
 -- list of all JSON files in that directory. Any non-directory FilePaths are
@@ -35,3 +36,23 @@ isJSON :: FilePath -> Bool
 isJSON p = takeExtension (lower p) == ".json"
   where
     lower = T.unpack . T.toLower . T.pack -- Looks silly, but Text handles unicode sanely so is preferred
+
+-- Checks if the given file name already exists. If it does, add a
+-- parenthetical number. Keep incrementing that number until the file doesn't
+-- exist. Easiest way to guarantee uniqueness.
+getUniqueFileName :: FilePath -> IO FilePath
+getUniqueFileName f = go f 0
+  where
+    go file attemptNum = do
+      let fn = addNumberToFileName file attemptNum
+      fileAlreadyExists <- doesFileExist fn
+      if fileAlreadyExists
+        then go file (attemptNum + 1)
+        else return fn
+
+addNumberToFileName :: FilePath -> Int -> FilePath
+addNumberToFileName f 0 = f
+addNumberToFileName f n = sansExtension <> " (" <> show n <> ")" <> extension
+  where
+    sansExtension = dropExtension f
+    extension = takeExtension f
