@@ -7,6 +7,17 @@ and this project adheres to the
 [Haskell Package Versioning Policy](https://pvp.haskell.org/).
 
 
+## Unreleased
+
+### Added
+
+- Allow passing directories of JSON to `kept` rather than having to manually
+  glob, e.g. with `*.json`. Now one can pass in any combination of individual
+  files, directories, or globbed lists of files. If a directory is passed in,
+  it is expanded (non-recursively) into the list of the `.json` files in that
+  directory.
+
+
 ## 0.2.0 - 2023-02-13
 
 ### Added

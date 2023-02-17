@@ -9,6 +9,7 @@ where
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Data.Time (UTCTime)
+import File (expandDirectories)
 import Markdown (MarkdownOpts (..), noteToMarkdownSystemTZ)
 import Note (Attachment, Metadata (..), Note (..), getAttachments)
 import Parse (parseNote)
@@ -41,9 +42,10 @@ data File = File
 -- produce markdown output. Either to files or printed to stdout.
 exportNotes :: KeptOptions -> [FilePath] -> IO ()
 exportNotes opts@(KeptOptions stdOut _ _) inFiles = do
+  expandedFiles <- expandDirectories inFiles
   if stdOut
-    then mapM_ (printNoteWithPadding opts) inFiles
-    else mapM_ (exportNoteToFile opts) inFiles
+    then mapM_ (printNoteWithPadding opts) expandedFiles
+    else mapM_ (exportNoteToFile opts) expandedFiles
   putStrLn "Export complete!"
   where
     printNoteWithPadding o f = do

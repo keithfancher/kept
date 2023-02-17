@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      File
       Kept
       Markdown
       Note

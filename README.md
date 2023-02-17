@@ -51,14 +51,17 @@ Here are some simple examples:
 # its name.
 $ kept ~/Takeout/Keep/Important.json
 
-# Alternatively, you can convert everything at once! (Be sure to actually glob
-# for `*.json`, as there will also likely be HTML and some other random files
-# in your Google Takeout export.)
+# Alternatively, you can convert everything at once! This will convert every
+# `.json` file in the specified directory.
+$ kept ~/Takeout/Keep
+
+# You can also glob! This is effectively the same as the above command. Note
+# that this will NOT work in Windows :'(
 $ kept ~/Takeout/Keep/*.json
 
 # The `t` option (aka `--title-in-yaml`) may come in handy for Obsidian
 # users. See the "Options / Flags" section below for more info!
-$ kept -t ~/Takeout/Keep/*.json
+$ kept -t ~/Takeout/Keep
 
 # Use the `-s` (aka `--stdout`) option to print the converted markdown content
 # to stdout rather than writing to a file. Useful to preview how a note would
