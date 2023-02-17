@@ -70,6 +70,28 @@ $ kept -s "~/Takeout/Keep/Great Ideas.json"
 ```
 
 
+## Important note for Windows users!
+
+**Unicode support in the Windows console is dicey.** (Yes, even in
+PowerShell!) To ensure your notes are converted as expected:
+
+1. Use PowerShell. (Or anything other than the default `cmd.exe`, probably.)
+2. Do the following magical incantation to properly enable UTF-8:
+```
+$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding =
+                    New-Object System.Text.UTF8Encoding
+```
+
+Only *after* the above should you use `kept` to convert your notes. For more
+information (and instructions on how to permanently un-break UTF-8 in the
+Windows console) check out [this S.O.
+post](https://stackoverflow.com/a/49481797).
+
+If you do *not* do the above step, and your notes contain *any Unicode
+characters whatsoever*, you will likely see `invalid character` errors and
+your notes **will not be properly exported**.
+
+
 ## Installation
 
 You've got two options:
