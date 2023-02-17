@@ -17,6 +17,11 @@ and this project adheres to the
   it is expanded (non-recursively) into the list of the `.json` files in that
   directory.
 
+### Fixed
+
+- Windows: embedded media attachments display correctly now. (Turns out
+  Obsidian wants `/` as a path delimiter even in Windows.)
+
 
 ## 0.2.0 - 2023-02-13
 

@@ -116,9 +116,14 @@ updateNoteAttachments note = note {metadata = newMetadata}
 -- Prepend the `media` directory to our attachment paths. Note this is the
 -- final RELATIVE path that will be written to the markdown note.
 newAttachmentPath :: [Attachment] -> [Attachment]
-newAttachmentPath = map (mediaDirectory </>)
+newAttachmentPath = map prependMediaDir
   where
-    mediaDirectory = ".." </> attachmentDir
+    -- NOTE: Using a hard-coded path-delimiter here (`/`) rather than the
+    -- saner, cross-platform function (`</>`). This path, written to the
+    -- markdown note, needs to use `/` for embedded attachments to work, EVEN
+    -- in Windows. (At least in Obsidian.)
+    mediaDirectory = "../" <> attachmentDir
+    prependMediaDir dir = mediaDirectory <> "/" <> dir
 
 printNoteFile :: KeptOptions -> Note -> IO ()
 printNoteFile opts note = do
