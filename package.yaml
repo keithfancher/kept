@@ -1,7 +1,7 @@
 name:                kept
 version:             0.3.0
 github:              "keithfancher/kept"
-license:             BSD3
+license:             GPL-3.0-or-later
 author:              "Keith Fancher"
 maintainer:          "nospam@example.com"
 copyright:           "2023 Keith Fancher"

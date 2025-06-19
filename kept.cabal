@@ -12,7 +12,7 @@ bug-reports:    https://github.com/keithfancher/kept/issues
 author:         Keith Fancher
 maintainer:     nospam@example.com
 copyright:      2023 Keith Fancher
-license:        BSD3
+license:        GPL-3.0-or-later
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
