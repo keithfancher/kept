@@ -24,6 +24,7 @@ editor](https://neovim.io/)).
 - Untitled notes are given filenames generated from note content, rather than
   Google's "timestamp-as-title" approach
 - Full support for media attachments (audio/images)
+- Easy to install: a single binary file with no external dependencies
 
 
 ## Quick-start
@@ -96,13 +97,22 @@ your notes **will not be properly exported**.
 
 You've got two options:
 
-1. Build from source. Not recommended unless you need a particular
+1. Install a binary [release](https://github.com/keithfancher/kept/releases).
+   The quick-and-easy route.
+2. Build from source. Not recommended unless you need a particular
    cutting-edge feature that isn't included in the latest binary release. (But
    don't worry: building isn't *complicated*. It's just *slow*.)
-2. Install a binary [release](https://github.com/keithfancher/kept/releases).
-   The quick-and-easy route.
 
 More details below.
+
+### Binary installation
+
+Download the latest build for your platform of choice from the Github
+[releases page](https://github.com/keithfancher/kept/releases). Extract the
+`kept` binary and put it somewhere in your `PATH`. That's it!
+
+And again, to uninstall: simply remove the `kept` binary from wherever you
+installed it.
 
 ### Building from source
 
@@ -134,15 +144,6 @@ $ stack exec kept -- -s ~/Takeout/Keep/test.json
 ```
 
 To uninstall, simply remove the `kept` binary from wherever you installed it.
-
-### Binary installation
-
-Download the latest build for your platform of choice from the Github
-[releases page](https://github.com/keithfancher/kept/releases). Extract the
-`kept` binary and put it somewhere in your `PATH`. That's it!
-
-And again, to uninstall: simply remove the `kept` binary from wherever you
-installed it.
 
 
 ## Paths of exported notes
